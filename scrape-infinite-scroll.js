@@ -12,6 +12,9 @@ function extractItems() {
     // if (typeof scrapeBlocker !== "undefined") {console.log('scrape blocked!');}
     const extractedElements = document.querySelectorAll('[role="feed"] .du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0');
     const items = [];
+    let text;
+    let likes;
+    let link;
     for (let element of extractedElements) {
         // text = element.querySelectorAll('[style="text-align:start"], [style="text-align: start;"]');
         text = element.querySelectorAll('[data-ad-preview="message"]');
@@ -20,9 +23,8 @@ function extractItems() {
         const textCombined = [];
         for (let textElement of text) {
             textCombined.push(textElement.innerText);
-            console.log({textCombined});
         }
-        var post = {
+        let post = {
             text: textCombined.join('\n'),
             likes: likes[0].innerText,
             link: link[0].href.split('?')[0],
@@ -30,6 +32,10 @@ function extractItems() {
         };
         items.push(post);
     }
+    // Try to keep the dom from getting too big, guessing that is what eventually crashes the browser.
+    Array.prototype.forEach.call( extractedElements, function( node ) {
+        node.parentNode.removeChild( node );
+    });
     return items;
 }
 
@@ -44,12 +50,14 @@ async function scrapeItems(
     try {
         let previousHeight;
         while (items.length < itemCount) {
-            items = await page.evaluate(extractItems);
+            itemsNew = await page.evaluate(extractItems);
+            items = items.concat(itemsNew);
             previousHeight = await page.evaluate('document.body.scrollHeight');
             await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
             await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
             await page.waitForTimeout(scrollDelay);
             fs.writeFileSync('./data.json', JSON.stringify(items, null, 2) , 'utf-8');
+            console.log(items.length);
         }
     } catch(e) { }
     return items;
@@ -58,12 +66,12 @@ async function scrapeItems(
 (async () => {
     // Set up Chromium browser and page.
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         // devtools: true,
     });
     const page = await browser.newPage();
-    page.setViewport({ width: 1280, height: 926 });
+    page.setViewport({ width: 1280, height: 9260 });
     // Don't download images
     await page.setRequestInterception(true);
     page.on('request', (req) => {
@@ -98,5 +106,5 @@ async function scrapeItems(
     // fs.writeFileSync('./data.json', JSON.stringify(items, null, 2) , 'utf-8');
 
     // Close the browser.
-    // await browser.close();
+    await browser.close();
 })();
