@@ -28,16 +28,15 @@
         }).addTo(map);
         $.getJSON("data.json", function(jsondata) {
             var likesMax = 0;
-            $.each(jsondata, function(index, element) {
-                if (element.latlong !== undefined) {
-                    likesMax = Math.max(likesMax, element.likes);
-                }
-            });
-            console.log(likesMax);
+            // $.each(jsondata, function(index, element) {
+            //     if (element.latlong !== undefined && !isNaN(parseInt(element.likes, 10))) {
+            //         likesMax = Math.max(likesMax, parseInt(element.likes, 10));
+            //     }
+            // });
             $.each(jsondata, function(index, element) {
                 if (element.latlong !== undefined) {
                     var marker = L.marker([element.latlong.lat,element.latlong.lng]).addTo(map);
-                    marker.setOpacity(element.likes / likesMax);
+                    // marker.setOpacity(element.likes / likesMax);
                     marker.bindPopup("likes: " + element.likes + " / date: " + element.date + "<br><a target=\"_blank\" href=\"" + element.link + "\">" + element.text + "</a>");
                 }
             });
