@@ -66,12 +66,12 @@ async function scrapeItems(
 (async () => {
     // Set up Chromium browser and page.
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         // devtools: true,
     });
     const page = await browser.newPage();
-    page.setViewport({ width: 1280, height: 9260 });
+    page.setViewport({ width: 1280, height: 1000 });
     // Don't download images
     await page.setRequestInterception(true);
     page.on('request', (req) => {
@@ -84,7 +84,7 @@ async function scrapeItems(
 
     // Navigate to the example page.
     await page.goto('https://www.facebook.com/groups/Hiddenportlandforthecurious?sorting_setting=CHRONOLOGICAL');
-
+    
     const cookies = [
         {
             'name': 'xs',
@@ -106,5 +106,5 @@ async function scrapeItems(
     // fs.writeFileSync('./data.json', JSON.stringify(items, null, 2) , 'utf-8');
 
     // Close the browser.
-    await browser.close();
+    // await browser.close();
 })();
