@@ -2,7 +2,6 @@
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.3.4",
     "playwright": "^1.17.1",
-    "puppeteer": "^13.0.1",
     "xhr2": "^0.2.1"
   },
   "devDependencies": {

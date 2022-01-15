@@ -8,7 +8,7 @@ async function main() {
     const context = await browser.newContext();
     const page = await context.newPage();
     console.log("Loading input file...");
-    var contentHtml = fs.readFileSync('./output/hp-2022-1-14_16-30-41.html', 'utf8');
+    var contentHtml = fs.readFileSync('./scraper-output/hidden-portland-june-2015.html', 'utf8');
     await page.setContent(contentHtml, {timeout: 0});
     console.log("Input file loaded.");
     const articles = await page.locator('article');
