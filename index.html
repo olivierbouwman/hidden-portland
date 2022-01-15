@@ -21,13 +21,22 @@
     </style>
 </head>
 <body>
+    <div id="info">
+        <p>This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a>. Only posts that could automatically be located are included, not all locations will be corcect.</p>
+    </div>
     <div id="filters">
-        <label for="years">Years</label>
-        <select name="years" id="years" multiple onchange="updateMarkers()"></select>
-        <label for="search">Search</label>
-        <input name="search" id="search" type="text" onchange="updateMarkers()">
-        <label for="likes" id="likes-label">Likes (at least 0)</label>
-        <input name="likes" id="likes" type="range" min="0" max="10" onchange="updateMarkers()">
+        <div class="filter-years">
+            <label for="years">Years</label>
+            <select name="years" id="years" multiple onchange="updateMarkers()"></select>
+        </div>
+        <div class="filter-likes">
+            <label for="likes" id="likes-label">Likes (at least 0)</label>
+            <input name="likes" id="likes" type="range" min="0" max="10" onchange="updateMarkers()">
+        </div>
+        <div class="filter-search">
+            <label for="search">Search</label>
+            <input name="search" id="search" type="text" onchange="updateMarkers()">
+        </div>
     </div>
     <div id="map"></div>
     <script>
