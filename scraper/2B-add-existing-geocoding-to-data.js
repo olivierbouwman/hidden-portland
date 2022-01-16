@@ -15,7 +15,12 @@ function run() {
 
         for (let postTarget of postsTarget) {
             if (postTarget.id == postSource.id) {
-                postTarget.latlong = postSource.latlong;
+                if (postSource.latlong !== undefined) {
+                    postTarget.latlong = postSource.latlong;
+                }
+                else {
+                    postTarget.latlong = {};
+                }
             }
         }
     }
