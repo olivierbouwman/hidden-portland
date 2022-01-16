@@ -40,7 +40,7 @@ async function main() {
             if (article.length < 10) {
                 await browser.close();
                 console.log("Writing output file...");
-                fs.writeFileSync('./data-alt.json', JSON.stringify(items, null, 2) , 'utf-8');
+                fs.writeFileSync('./data.json', JSON.stringify(items, null, 2) , 'utf-8');
                 console.log("Done.");
                 return;
             }

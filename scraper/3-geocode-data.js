@@ -1,7 +1,7 @@
 const fs = require('fs');
 const https = require('https')
 var url_prefix = 'https://maps.googleapis.com/maps/api/geocode/json?address='
-var url_suffix = ', Portland, OR&key=' + process.env.GOOGLE_MAPS_API_KEY;
+// var url_suffix = ', Portland, OR&key=' + process.env.GOOGLE_MAPS_API_KEY;
 
 let rawdata = fs.readFileSync('data.json');
 let posts = JSON.parse(rawdata);
