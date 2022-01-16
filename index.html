@@ -9,6 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
         html, body {
+            margin: 0px;
             height: 100%;
             width: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -98,7 +99,6 @@
                         if (search.length === 0 || (search.length > 0 && element.text.toLowerCase().includes(search.toLowerCase()))) {
                             if (Number(element.likes) >= document.getElementById('likes').value) {
                                 var marker = L.marker([element.latlong.lat,element.latlong.lng]);
-                                // marker.setOpacity(element.likes / likesMax);
                                 marker.bindPopup('likes: ' + element.likes + ' / date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
                                 markersLayer.addLayer(marker);
                             }

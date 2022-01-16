@@ -60,6 +60,7 @@ async function scrapeItems(
             await delay(scrollDelay);
             saveCounter = saveCounter + 1;
             if (saveCounter == saveDelay) {
+                saveCounter = 0;
                 let now     = new Date();
                 let year    = now.getFullYear();
                 let month   = now.getMonth()+1;
@@ -70,7 +71,6 @@ async function scrapeItems(
                 let datetime = year + "-" + month + "-" + day + "_" + hour + "-" + minute + "-" + second;
                 let content = await page.content();
                 fs.writeFileSync('./scraper-output/hp-' + datetime + '.html', content, 'utf-8');
-                saveCounter = 0;
             }
         }
     } catch(e) {
