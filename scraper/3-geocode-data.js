@@ -8,8 +8,6 @@ let posts = JSON.parse(rawdata);
 let counter = 0;
 let counterFail = 0;
 
-// there was a bug with ampersands so we migh want to redo geocoding of data-live items or just the entirety of 2021.
-
 async function run() {
     for (let post of posts) {
         // Only process if it hasn't been before and also process a certain date to prevent accidental high cost.
