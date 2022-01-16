@@ -112,7 +112,8 @@
         map = L.map('map', {
             renderer: L.canvas(),
             preferCanvas: true,
-            zoomAnimation: false
+            zoomAnimation: false,
+            attributionControl: false
         }).setView([45.5428128,-122.7244404], 12);
         var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoib2xpdmllcmJvdXdtYW4iLCJhIjoickVlQjBPcyJ9.1yW9yNkaVPQLxet0VsSSBA', {
             maxZoom: 18,
