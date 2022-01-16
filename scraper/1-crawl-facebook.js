@@ -69,7 +69,7 @@ async function scrapeItems(
                 let second  = now.getSeconds();
                 let datetime = year + "-" + month + "-" + day + "_" + hour + "-" + minute + "-" + second;
                 let content = await page.content();
-                fs.writeFileSync('./output/hp-' + datetime + '.html', content, 'utf-8');
+                fs.writeFileSync('./scraper-output/hp-' + datetime + '.html', content, 'utf-8');
                 saveCounter = 0;
             }
         }
