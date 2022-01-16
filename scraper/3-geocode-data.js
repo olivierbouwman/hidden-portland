@@ -13,7 +13,7 @@ let counterFail = 0;
 async function run() {
     for (let post of posts) {
         // Only process if it hasn't been before and also process a certain date to prevent accidental high cost.
-        if (post.text.length > 5 && post.latlong == undefined && post.date.substring(0,4) == "2021") {
+        if (post.text.length > 5 && post.latlong == undefined && post.date.substring(0,4) == "2019") {
             counter = counter + 1
             let text = post.text;
             text = text.replace(/… More/g, ' ');
@@ -62,6 +62,7 @@ function processRecord(post, url) {
             });
         }).on('error', function(e){
             console.log("Got an error: ", e);
+            console.log("post id: " + post.id);
         });
     });
 }

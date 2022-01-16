@@ -58,6 +58,7 @@ async function main() {
                 let post_reactions = -1;
                 if (post_reactions_element_count > 0) {
                     post_reactions = await post_reactions_raw.innerText();
+                    // post_reactions = cleanLikesString(); // Todo: fix things like 1.3K
                 }
                 // const post_comments_raw = await page.locator('._1j-c >> nth=0').innerText();
                 // const post_comments = post_comments_raw.split(" ")[0];
@@ -84,6 +85,9 @@ main();
 
 function isValidDate(d) {
     return d instanceof Date && !isNaN(d);
+}
+
+function cleanLikesString(likesString) {
 }
 
 function cleanDateTimeString(dateTimeString) {
