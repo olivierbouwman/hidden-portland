@@ -28,17 +28,21 @@
         }
         #filters {
             position: absolute;
-            right: 10px;
-            top: 10px;
+            right: 0px;
+            top: 0px;
             z-index: 500;
             background-color: rgba(255,255,255,0.8);
-            height: 63px;
+            padding-bottom: 4px;
+            padding-top: 4px;
+            padding-left: 4px;
+            padding-right: 4px;
+            margin-left: 60px;
+            text-align: right;
         }
         #filters label {
-            margin-left: 10px;
-        }
-        #filters .text {
-            margin-left: 10px;
+            display: block;
+            padding-bottom: 10px;
+            white-space: nowrap;
         }
         #years {
             vertical-align: top;
@@ -50,13 +54,10 @@
     <div id="map"></div>
     <div id="loading"><span class="text">Loading...</span></div>
     <div id="filters">
-        <label for="years">Years</label>
-        <select name="years" id="years" multiple onchange="updateMarkers()"></select>
-        <label for="likes" id="likes-label">Likes (at least 0)</label>
-        <input name="likes" id="likes" type="range" min="0" max="10" onchange="updateMarkers()">
-        <label for="search">Search</label>
-        <input name="search" id="search" type="text" onchange="updateMarkers()">
-        <span class="text">This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a>. More info about this map on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</span>
+        <label for="years">Years <select name="years" id="years" multiple onchange="updateMarkers()"></select></label>
+        <label for="likes" id="likes-label"><span id="likes-text">Likes (at least 0)</span><input name="likes" id="likes" type="range" min="0" max="10" onchange="updateMarkers()"></label>
+        <label for="search">Search <input name="search" id="search" type="text" onchange="updateMarkers()"></label>
+        <span class="text">This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a>.<br>More info about this map on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</span>
     </div>
     <script>
         var likesMax = 0;
@@ -98,7 +99,7 @@
         function updateMarkers() {
             document.getElementById('loading').style.display = "block";
             // Update likes value.
-            document.getElementById('likes-label').innerText = "Likes (at least " + document.getElementById('likes').value + ")"
+            document.getElementById('likes-text').innerText = "Likes (at least " + document.getElementById('likes').value + ")"
             // Clear all markers.
             markersLayer.clearLayers();
             var search = document.getElementById('search').value;
