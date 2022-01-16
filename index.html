@@ -8,16 +8,123 @@
     <script src="leaflet/leaflet.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
-        html, body, #map {
+        html, body {
             height: 100%;
             width: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        #loading {
+            display: none;
+            font-size: 40px;
+            background-color: rgba(255,255,255,0.5);
+            z-index: 600;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+        #filters {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            z-index: 500;
+            background-color: rgba(255,255,255,0.8);
+            height: 63px;
+        }
+        #filters label {
+            margin-left: 10px;
+        }
+        #filters .text {
+            margin-left: 10px;
+        }
+        #years {
+            vertical-align: top;
+            height: 60px;
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="loading"><span class="text">Loading...</span></div>
+    <div id="filters">
+        <label for="years">Years</label>
+        <select name="years" id="years" multiple onchange="updateMarkers()"></select>
+        <label for="likes" id="likes-label">Likes (at least 0)</label>
+        <input name="likes" id="likes" type="range" min="0" max="10" onchange="updateMarkers()">
+        <label for="search">Search</label>
+        <input name="search" id="search" type="text" onchange="updateMarkers()">
+        <span class="text">This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a>. More info about this map on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</span>
+    </div>
     <script>
-        var map = L.map('map').setView([45.5428128,-122.7244404], 12);
+        var likesMax = 0;
+        var years = [];
+        var mapData = [];
+        var map;
+        var markersLayer = new L.LayerGroup();
+        $.getJSON("data.json", function(jsondata) {
+            $.each(jsondata, function(index, element) {
+                if (element.latlong !== undefined && element.latlong.lat !== undefined) {
+                    // We can map this, add it to our list.
+                    mapData.push(element);
+                    // Find all years.
+                    if (Number.isInteger(Number(element.date.substring(0,4))) && years.indexOf(element.date.substring(0,4)) === -1) {
+                        years.push(element.date.substring(0,4));
+                        select = document.getElementById('years');
+                        var opt = document.createElement('option');
+                        opt.value = element.date.substring(0,4);
+                        opt.innerHTML = element.date.substring(0,4);
+                        select.appendChild(opt);
+                    }
+                    $("#years").html($("#years option").sort(function (a, b) {
+                        return a.text == b.text ? 0 : a.text > b.text ? -1 : 1
+                    }))
+                    // Find highest number of likes.
+                    if (!isNaN(Number(element.likes))) {
+                        likesMax = Math.max(likesMax, Number(element.likes));
+                    }
+                }
+            });
+            document.getElementById("likes").max = likesMax;
+            document.getElementById("likes").value = 0;
+            // Enable 2 most recent years;
+            document.getElementById("years").options[0].selected = true;
+            // document.getElementById("years").options[1].selected = true;
+            updateMarkers();
+        });
+
+        function updateMarkers() {
+            document.getElementById('loading').style.display = "block";
+            // Update likes value.
+            document.getElementById('likes-label').innerText = "Likes (at least " + document.getElementById('likes').value + ")"
+            // Clear all markers.
+            markersLayer.clearLayers();
+            var search = document.getElementById('search').value;
+            $.each(mapData, function(index, element) {
+                for (var option of document.getElementById('years').options) {
+                    if (option.selected && option.value == element.date.substring(0,4)) {
+                        if (search.length === 0 || (search.length > 0 && element.text.toLowerCase().includes(search.toLowerCase()))) {
+                            if (Number(element.likes) >= document.getElementById('likes').value) {
+                                var marker = L.marker([element.latlong.lat,element.latlong.lng]);
+                                // marker.setOpacity(element.likes / likesMax);
+                                marker.bindPopup('likes: ' + element.likes + ' / date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
+                                markersLayer.addLayer(marker);
+                            }
+                        }
+                    }
+                }
+            });
+            markersLayer.addTo(map);
+            document.getElementById('loading').style.display = "none";
+        }
+
+        map = L.map('map', {
+            renderer: L.canvas(),
+            preferCanvas: true,
+            zoomAnimation: false
+        }).setView([45.5428128,-122.7244404], 12);
         var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoib2xpdmllcmJvdXdtYW4iLCJhIjoickVlQjBPcyJ9.1yW9yNkaVPQLxet0VsSSBA', {
             maxZoom: 18,
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
@@ -26,21 +133,6 @@
             tileSize: 512,
             zoomOffset: -1
         }).addTo(map);
-        $.getJSON("data.json", function(jsondata) {
-            var likesMax = 0;
-            // $.each(jsondata, function(index, element) {
-            //     if (element.latlong !== undefined && !isNaN(parseInt(element.likes, 10))) {
-            //         likesMax = Math.max(likesMax, parseInt(element.likes, 10));
-            //     }
-            // });
-            $.each(jsondata, function(index, element) {
-                if (element.latlong !== undefined) {
-                    var marker = L.marker([element.latlong.lat,element.latlong.lng]).addTo(map);
-                    // marker.setOpacity(element.likes / likesMax);
-                    marker.bindPopup("likes: " + element.likes + " / date: " + element.date + "<br><a target=\"_blank\" href=\"" + element.link + "\">" + element.text + "</a>");
-                }
-            });
-        });
     </script>
 </body>
 </html>

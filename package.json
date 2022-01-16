@@ -1,7 +1,10 @@
 {
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.3.4",
-    "puppeteer": "^13.0.0",
+    "playwright": "^1.17.1",
     "xhr2": "^0.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.17.1"
   }
 }

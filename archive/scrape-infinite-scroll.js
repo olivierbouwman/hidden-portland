@@ -17,28 +17,30 @@ function extractItems() {
     let link;
     document.querySelectorAll('[role="feed"] .du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0').forEach(function( node ) {
         text = node.querySelectorAll('[data-ad-preview="message"]');
-        likes = node.querySelectorAll('.pcp91wgn');
-        link = node.querySelectorAll('a[href^="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/"]');
-        const textCombined = [];
-        for (let textElement of text) {
-            textCombined.push(textElement.innerText);
+        if (text.length > 0) {
+            likes = node.querySelectorAll('.pcp91wgn');
+            link = node.querySelectorAll('a[href^="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/"]');
+            const textCombined = [];
+            for (let textElement of text) {
+                textCombined.push(textElement.innerText);
+            }
+            let post = {
+                text: textCombined.join('\n'),
+                likes: likes[0].innerText,
+                link: link[0].href.split('?')[0],
+                date: link[0].innerText,
+            };
+            // See if this post is already in our source data.
+            // for (var i=0 ; i < post.list.length ; i++) {
+            //     if (obj.post[i][searchField] == searchVal) {
+            //         results.push(obj.list[i]);
+            //     }
+            // }
+            items.push(post);
+            // Try to keep the dom from getting too big, guessing that is what eventually crashes the browser.
+            node.parentNode.removeChild( node );
+            // node.innerHTML = "captured";
         }
-        let post = {
-            text: textCombined.join('\n'),
-            likes: likes[0].innerText,
-            link: link[0].href.split('?')[0],
-            date: link[0].innerText,
-        };
-        // See if this post is already in our source data.
-        // for (var i=0 ; i < post.list.length ; i++) {
-        //     if (obj.post[i][searchField] == searchVal) {
-        //         results.push(obj.list[i]);
-        //     }
-        // }
-        items.push(post);
-        // Try to keep the dom from getting too big, guessing that is what eventually crashes the browser.
-        node.parentNode.removeChild( node );
-        // node.parentNodeinnerHTML
     });
     return items;
 }
@@ -84,7 +86,7 @@ async function scrapeItems(
         // devtools: true,
     });
     const page = await browser.newPage();
-    page.setViewport({ width: 1280, height: 5000 });
+    page.setViewport({ width: 375, height: 5000 });
     // Don't download images
     await page.setRequestInterception(true);
     page.on('request', (req) => {
@@ -103,11 +105,11 @@ async function scrapeItems(
     const cookies = [
         {
             'name': 'xs',
-            'value': '46%3AwsKioNVhrWXJqw%3A2%3A1641630689%3A-1%3A-1'
+            'value': '20%3AyNA8y4_tCG_EHw%3A2%3A1642118649%3A-1%3A-1'
         },
         {
             'name': 'c_user',
-            'value': '100076737799177'
+            'value': '100076956680790'
         }
     ];
 
