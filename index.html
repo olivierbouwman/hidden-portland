@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hidden Portland for the Curious</title>
+    <title>Hidden Portland for the Curious Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
@@ -16,15 +16,6 @@
         #map {
             height: 100%;
             width: 100%;
-        }
-        #loading {
-            display: none;
-            font-size: 40px;
-            background-color: rgba(255,255,255,0.5);
-            z-index: 600;
-            position: absolute;
-            top: 50%;
-            left: 50%;
         }
         #filters {
             position: absolute;
@@ -52,7 +43,6 @@
 </head>
 <body>
     <div id="map"></div>
-    <div id="loading"><span class="text">Loading...</span></div>
     <div id="filters">
         <label for="years">Years <select name="years" id="years" multiple onchange="updateMarkers()"></select></label>
         <label for="likes" id="likes-label"><span id="likes-text">Likes (at least 0)</span><input name="likes" id="likes" type="range" min="0" max="10" onchange="updateMarkers()"></label>
@@ -97,7 +87,6 @@
         });
 
         function updateMarkers() {
-            document.getElementById('loading').style.display = "block";
             // Update likes value.
             document.getElementById('likes-text').innerText = "Likes (at least " + document.getElementById('likes').value + ")"
             // Clear all markers.
@@ -118,7 +107,6 @@
                 }
             });
             markersLayer.addTo(map);
-            document.getElementById('loading').style.display = "none";
         }
 
         map = L.map('map', {
