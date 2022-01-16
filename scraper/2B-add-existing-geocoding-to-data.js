@@ -15,6 +15,9 @@ function run() {
 
         for (let postTarget of postsTarget) {
             if (postTarget.id == postSource.id) {
+                // if (postSource.text.includes(" between ")) {
+                //     delete postTarget.latlong;
+                // }
                 if (postSource.latlong !== undefined) {
                     postTarget.latlong = postSource.latlong;
                 }

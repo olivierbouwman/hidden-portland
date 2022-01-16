@@ -50,7 +50,7 @@ async function main() {
                 const post_date = await cleanDateTimeString(date_string);
                 // if a post is a share like https://m.facebook.com/groups/Hiddenportlandforthecurious/permalink/10165748138935062/
                 // we might want to include the text from the original, we are not right now due to nth=0.
-                const post_text = await page.locator('._5rgt._5nk5._5msi >> nth=0').innerText();
+                const post_text = await page.locator('._5rgt._5nk5._5msi >> nth=0').innerText().text.replace(/… More/g, ' ');
                 const post_id_raw = await page.locator('._52jc._5qc4._78cz._24u0._36xo a >> nth=0').getAttribute("href");
                 const post_id = post_id_raw.match("/permalink/(.*)/")[1];
                 const post_reactions_raw = await page.locator('._1g06');
