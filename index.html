@@ -90,7 +90,13 @@
                 radius: 5
             }).bindPopup('This is your current location.');
             markersLayer.addLayer(marker);
-            map.panTo(new L.LatLng(position.coords.latitude, position.coords.longitude));
+            // If current location falls within bounds of Portland, pan there.
+            if (position.coords.latitude < 45.687769
+                && position.coords.latitude > 45.254888
+                && position.coords.longitude > -122.987921
+                && position.coords.longitude < -122.203901) {
+                map.panTo(new L.LatLng(position.coords.latitude, position.coords.longitude));
+            }
         }
 
         function updateLikes() {
