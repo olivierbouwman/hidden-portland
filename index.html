@@ -58,6 +58,7 @@
         var mapData = [];
         var map;
         var markersLayer = new L.LayerGroup();
+        var marker;
         getLocation();
         $.getJSON("data.json", function(jsondata) {
             let likesMax = 0;
@@ -121,6 +122,7 @@
             // Clear all markers.
             markersLayer.clearLayers();
             var search = document.getElementById('search').value;
+            var markers = [];
             $.each(mapData, function(index, element) {
                 // Only load markers for selected years.
                 if (Number(element.date.substring(0,4)) >= document.getElementById('years').value) {
@@ -128,18 +130,46 @@
                     if (search.length === 0 || (search.length > 0 && element.text.toLowerCase().includes(search.toLowerCase()))) {
                         // Only load markers that match our minimum number of likes.
                         if (Number(element.likes) >= document.getElementById('likes').value) {
-                            // Create marker.
-                            var marker = L.circleMarker([element.latlong.lat,element.latlong.lng], {
-                                color: '#3388ff',
-                                radius: 10
-                            }).bindPopup('Likes: ' + element.likes + ' / Date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
-                            markersLayer.addLayer(marker);
+                            // Filter out markers that all have the same location.
+                            if (!(element.latlong.lat == 45.515232 && element.latlong.lng == -122.6783853)) {
+                                // Create marker.
+                                var marker = L.circleMarker([element.latlong.lat,element.latlong.lng], {
+                                    color: '#3388ff',
+                                    radius: 10,
+                                    opacity: 0.9
+                                }).bindPopup('Likes: ' + element.likes + ' / Date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
+                                markers.push(marker);
+                                // markersLayer.addLayer(marker);
+                            }
                         }
                     }
                 }
             });
+            // Combine popups that are in the same location.
+            console.log(markers.length);
+            let markersDelete = [];
+            $.each(markers, function(index1, marker1) {
+                $.each(markers, function(index2, marker2) {
+                    if (index1 !== index2 && marker1._latlng.lat === marker2._latlng.lat && marker1._latlng.lng === marker2._latlng.lng) {
+                        // console.log(index1 + "," + index2 + "/" + marker1._latlng.lat + "," + marker2._latlng.lat + "/" + marker1._latlng.lng + "," + marker2._latlng.lng);
+                        if (marker1._popup.getContent().length < 268000000) {
+                            marker1._popup.setContent(marker1._popup.getContent() + "<br>" + marker2._popup.getContent());
+                        }
+                        markersDelete.push(index2);
+                    }
+                });
+            });
+
+            console.log(markersDelete.length);
+            while(markersDelete.length) {
+                markers.splice(markersDelete.pop(), 1);
+            }
+            $.each(markers, function(index, element) {
+                markersLayer.addLayer(element);
+            });
             markersLayer.addTo(map);
         }
+
         map = L.map('map', {
             renderer: L.canvas(),
             preferCanvas: true,
@@ -152,6 +182,10 @@
             tileSize: 512,
             zoomOffset: -1
         }).addTo(map);
+        map.on('popupopen', function(e) {
+            marker = e.popup._source;
+            console.log(marker._latlng.lat + "," + marker._latlng.lng);
+        });
     </script>
 </body>
 </html>
