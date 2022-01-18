@@ -7,10 +7,9 @@ async function main() {
     const context = await browser.newContext({
         userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/15.4 Mobile/15A372 Safari/604.1"
     });
-    // await context.addCookies([{name:"xs", value: "34%3AqgOE8BTIYS5yMA%3A2%3A1642120648%3A-1%3A-1%3A%3AAcUxYbgEq1Uvogo1z9A022KiHnA0TyvSd022bH2_uKg", domain: ".facebook.com", path: "/"}]);
-    // await context.addCookies([{name:"c_user", value: "100076956680790", domain: ".facebook.com", path: "/"}]);
-    await context.addCookies([{name:"xs", value: "50%3ABF17A2MD1rWAkg%3A2%3A1642281898%3A-1%3A-1%3A%3AAcWEUv13M_4u8QUfhl54c9mJ_6Zhx3ZHAgLpr6Y_1g", domain: ".facebook.com", path: "/"}]);
-    await context.addCookies([{name:"c_user", value: "100077127405933", domain: ".facebook.com", path: "/"}]);
+    // Set these in your terminal using `export FACEBOOK_XS=[code]`;
+    await context.addCookies([{name:"xs", value: process.env.FACEBOOK_XS, domain: ".facebook.com", path: "/"}]);
+    await context.addCookies([{name:"c_user", value: process.env.FACEBOOK_C_USER, domain: ".facebook.com", path: "/"}]);
     const page = await context.newPage();
     await page.route('**/*', (route) => {
         return route.request().resourceType() === 'image'
