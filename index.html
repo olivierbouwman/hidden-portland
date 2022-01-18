@@ -36,27 +36,24 @@
             padding-bottom: 10px;
             white-space: nowrap;
         }
-        #years {
-            vertical-align: top;
-            height: 60px;
-        }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <div id="filters">
-        <label for="years">Years <select name="years" id="years" multiple onchange="updateMarkers()"></select></label>
-        <label for="likes" id="likes-label"><span id="likes-text">Likes (at least 0)</span><input name="likes" id="likes" type="range" min="0" max="10" onchange="updateMarkers()"></label>
+        <label for="years" id="years-label"><span id="years-text">Years (starting at 0)</span><input name="years" id="years" type="range" min="0" max="0" onchange="updateYears();"></label>
+        <label for="likes" id="likes-label"><span id="likes-text">Likes (at least 0)</span><input name="likes" id="likes" type="range" min="0" max="10" onchange="updateLikes();"></label>
         <label for="search">Search <input name="search" id="search" type="text" onchange="updateMarkers()"></label>
         <span class="text">This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a>.<br>More info about this map on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</span>
     </div>
     <script>
-        var likesMax = 0;
-        var years = [];
         var mapData = [];
         var map;
         var markersLayer = new L.LayerGroup();
+        getLocation();
         $.getJSON("data.json", function(jsondata) {
+            let likesMax = 0;
+            let years = [];
             $.each(jsondata, function(index, element) {
                 if (element.latlong !== undefined && element.latlong.lat !== undefined) {
                     // We can map this, add it to our list.
@@ -64,62 +61,80 @@
                     // Find all years.
                     if (Number.isInteger(Number(element.date.substring(0,4))) && years.indexOf(element.date.substring(0,4)) === -1) {
                         years.push(element.date.substring(0,4));
-                        select = document.getElementById('years');
-                        var opt = document.createElement('option');
-                        opt.value = element.date.substring(0,4);
-                        opt.innerHTML = element.date.substring(0,4);
-                        select.appendChild(opt);
                     }
-                    $("#years").html($("#years option").sort(function (a, b) {
-                        return a.text == b.text ? 0 : a.text > b.text ? -1 : 1
-                    }))
                     // Find highest number of likes.
                     if (!isNaN(Number(element.likes))) {
                         likesMax = Math.max(likesMax, Number(element.likes));
                     }
                 }
             });
+            let yearMin = Math.min(...years);
+            let yearMax = Math.max(...years);
             document.getElementById("likes").max = likesMax;
             document.getElementById("likes").value = 0;
-            // Enable 2 most recent years;
-            document.getElementById("years").options[0].selected = true;
-            // document.getElementById("years").options[1].selected = true;
-            updateMarkers();
+            document.getElementById("years").max = yearMax;
+            document.getElementById("years").min = yearMin;
+            document.getElementById("years").value = yearMin;
+            updateYears();
         });
 
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            }
+        }
+
+        function showPosition(position) {
+            var marker = L.circleMarker([position.coords.latitude,position.coords.longitude], {
+                color: '#ff0000',
+                radius: 5
+            }).bindPopup('This is your current location.');
+            markersLayer.addLayer(marker);
+            map.panTo(new L.LatLng(position.coords.latitude, position.coords.longitude));
+        }
+
+        function updateLikes() {
+            document.getElementById('likes-text').innerText = "Likes (at least " + document.getElementById('likes').value + ")";
+            updateMarkers();
+        }
+
+        function updateYears() {
+            document.getElementById('years-text').innerText = "Years (starting at " + document.getElementById('years').value + ")";
+            updateMarkers();
+        }
+
         function updateMarkers() {
-            // Update likes value.
-            document.getElementById('likes-text').innerText = "Likes (at least " + document.getElementById('likes').value + ")"
             // Clear all markers.
             markersLayer.clearLayers();
             var search = document.getElementById('search').value;
             $.each(mapData, function(index, element) {
-                for (var option of document.getElementById('years').options) {
-                    if (option.selected && option.value == element.date.substring(0,4)) {
-                        if (search.length === 0 || (search.length > 0 && element.text.toLowerCase().includes(search.toLowerCase()))) {
-                            if (Number(element.likes) >= document.getElementById('likes').value) {
-                                var marker = L.marker([element.latlong.lat,element.latlong.lng]);
-                                marker.bindPopup('likes: ' + element.likes + ' / date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
-                                markersLayer.addLayer(marker);
-                            }
+                // Only load markers for selected years.
+                if (Number(element.date.substring(0,4)) >= document.getElementById('years').value) {
+                    // Only load markers that match our search term.
+                    if (search.length === 0 || (search.length > 0 && element.text.toLowerCase().includes(search.toLowerCase()))) {
+                        // Only load markers that match our minimum number of likes.
+                        if (Number(element.likes) >= document.getElementById('likes').value) {
+                            // Create marker.
+                            var marker = L.circleMarker([element.latlong.lat,element.latlong.lng], {
+                                color: '#3388ff',
+                                radius: 10
+                            }).bindPopup('Likes: ' + element.likes + ' / Date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
+                            markersLayer.addLayer(marker);
                         }
                     }
                 }
             });
             markersLayer.addTo(map);
         }
-
         map = L.map('map', {
             renderer: L.canvas(),
             preferCanvas: true,
             zoomAnimation: false,
             attributionControl: false
-        }).setView([45.5428128,-122.7244404], 12);
+        }).setView([45.5230313, -122.6659288], 14);
         var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoib2xpdmllcmJvdXdtYW4iLCJhIjoickVlQjBPcyJ9.1yW9yNkaVPQLxet0VsSSBA', {
-            maxZoom: 18,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
-                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            id: 'mapbox/streets-v11',
+            maxZoom: 20,
+            id: 'mapbox/dark-v10',
             tileSize: 512,
             zoomOffset: -1
         }).addTo(map);
