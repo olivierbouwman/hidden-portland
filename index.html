@@ -138,18 +138,18 @@
         function updateLikes() {
             updateMarkers();
             document.getElementById('likes-text').innerText = "Likes (at least " + document.getElementById('likes').value + ")";
-            gtag('event', 'likes', { 'event_category': 'filter', 'event_label': document.getElementById('likes').value });
+            gtag('event', 'select_content', { 'content_type': 'likes', 'item_id': document.getElementById('likes').value });
         }
 
         function updateYears() {
             updateMarkers();
             document.getElementById('years-text').innerText = "Years (starting at " + document.getElementById('years').value + ")";
-            gtag('event', 'year', { 'event_category': 'filter', 'event_label': document.getElementById('years').value });
+            gtag('event', 'select_content', { 'content_type': 'years', 'item_id': document.getElementById('years').value });
         }
 
         function updateSearch() {
             updateMarkers();
-            gtag('event', 'search', { 'event_category': 'filter', 'event_label': document.getElementById('search').value });
+            gtag('event', 'search', { 'search_term': document.getElementById('search').value });
         }
 
         function updateMarkers() {
@@ -184,7 +184,7 @@
         }).setView([45.5230313, -122.6659288], 14);;
         map.addLayer(layer);
         map.on('popupopen', function() {
-            gtag('event', 'popup', { 'event_category': 'map' });
+            gtag('event', 'click', { 'event_category': 'popup' });
         });
     </script>
 </body>
