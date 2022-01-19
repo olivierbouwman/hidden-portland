@@ -136,29 +136,20 @@
         }
 
         function updateLikes() {
-            gtag('event', 'likes', {
-                'event_category': 'filter',
-                'event_label': document.getElementById('likes').value,
-            });
-            document.getElementById('likes-text').innerText = "Likes (at least " + document.getElementById('likes').value + ")";
             updateMarkers();
+            document.getElementById('likes-text').innerText = "Likes (at least " + document.getElementById('likes').value + ")";
+            gtag('event', 'likes', { 'event_category': 'filter', 'event_label': document.getElementById('likes').value });
         }
 
         function updateYears() {
-            gtag('event', 'year', {
-                'event_category': 'filter',
-                'event_label': document.getElementById('years').value,
-            });
-            document.getElementById('years-text').innerText = "Years (starting at " + document.getElementById('years').value + ")";
             updateMarkers();
+            document.getElementById('years-text').innerText = "Years (starting at " + document.getElementById('years').value + ")";
+            gtag('event', 'year', { 'event_category': 'filter', 'event_label': document.getElementById('years').value });
         }
 
         function updateSearch() {
-            gtag('event', 'search', {
-                'event_category': 'filter',
-                'event_label': document.getElementById('search').value,
-            });
             updateMarkers();
+            gtag('event', 'search', { 'event_category': 'filter', 'event_label': document.getElementById('search').value });
         }
 
         function updateMarkers() {
@@ -192,6 +183,9 @@
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         }).setView([45.5230313, -122.6659288], 14);;
         map.addLayer(layer);
+        map.on('popupopen', function() {
+            gtag('event', 'popup', { 'event_category': 'map' });
+        });
     </script>
 </body>
 </html>
