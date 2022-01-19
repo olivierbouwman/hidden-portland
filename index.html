@@ -4,7 +4,6 @@
     <title>Hidden Portland for the Curious Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hidden Portland for the Curious Map</title>
     <meta name="title" content="Hidden Portland for the Curious Map">
     <meta name="description" content="Discover Portland through the eyes of the Facebook group 'Hidden Portland for the Curious'.">
     <meta property="og:type" content="website">
@@ -18,15 +17,22 @@
     <meta property="twitter:description" content="Discover Portland through the eyes of the Facebook group 'Hidden Portland for the Curious'.">
     <meta property="twitter:image:src" content="images/meta.jpg">
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
-    <script src="leaflet/leaflet.js"></script>
-    <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+    <link rel="stylesheet" href="leaflet/MarkerCluster/MarkerCluster.css" />
+    <link rel="stylesheet" href="leaflet/MarkerCluster/MarkerCluster.Default.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="leaflet/MarkerCluster/MarkerCluster.css" />
-    <link rel="stylesheet" type="text/css" href="leaflet/MarkerCluster/MarkerCluster.Default.css" />
-    <script type='text/javascript' src='leaflet/MarkerCluster/leaflet.markercluster.js'></script>
+    <script src="leaflet/leaflet.js"></script>
+    <script src='leaflet/MarkerCluster/leaflet.markercluster.js'></script>
+    <script src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G1HN96YZ99"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-G1HN96YZ99');
+    </script>
     <style>
         html, body {
-            margin: 0px;
+            margin: 0;
             height: 100%;
             width: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -37,8 +43,8 @@
         }
         #filters {
             position: absolute;
-            right: 0px;
-            top: 0px;
+            right: 0;
+            top: 0;
             z-index: 500;
             background-color: rgba(255,255,255,0.8);
             padding-bottom: 4px;
@@ -65,13 +71,6 @@
             justify-content: center;
         }
     </style>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G1HN96YZ99"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-G1HN96YZ99');
-    </script>
 </head>
 <body>
     <div id="map"></div>
