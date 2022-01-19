@@ -4,6 +4,19 @@
     <title>Hidden Portland for the Curious Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hidden Portland for the Curious Map</title>
+    <meta name="title" content="Hidden Portland for the Curious Map">
+    <meta name="description" content="Discover Portland through the eyes of the Facebook group 'Hidden Portland for the Curious'.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://olivierbouwman.github.io/hidden-portland/">
+    <meta property="og:title" content="Hidden Portland for the Curious Map">
+    <meta property="og:description" content="Discover Portland through the eyes of the Facebook group 'Hidden Portland for the Curious'.">
+    <meta property="og:image" content="images/meta-facebook.jpg">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://olivierbouwman.github.io/hidden-portland/">
+    <meta property="twitter:title" content="Hidden Portland for the Curious Map">
+    <meta property="twitter:description" content="Discover Portland through the eyes of the Facebook group 'Hidden Portland for the Curious'.">
+    <meta property="twitter:image" content="images/meta-twitter.jpg">
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
     <script src="leaflet/leaflet.js"></script>
     <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
@@ -181,7 +194,7 @@
             zoomAnimation: false,
             attributionControl: true,
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-        }).setView([45.5230313, -122.6659288], 14);;
+        }).setView([45.5230313, -122.6659288], 14);
         map.addLayer(layer);
         map.on('popupopen', function() {
             gtag('event', 'click', { 'event_category': 'popup' });
