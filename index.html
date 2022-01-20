@@ -19,9 +19,11 @@
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
     <link rel="stylesheet" href="leaflet/MarkerCluster/MarkerCluster.css" />
     <link rel="stylesheet" href="leaflet/MarkerCluster/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="leaflet/Locate/L.Control.Locate.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="leaflet/leaflet.js"></script>
     <script src='leaflet/MarkerCluster/leaflet.markercluster.js'></script>
+    <script src="leaflet/Locate/L.Control.Locate.min.js"></script>
     <script src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-G1HN96YZ99"></script>
     <script>
@@ -93,7 +95,6 @@
                 return L.divIcon({ html: cluster.getChildCount(), className: 'circle', iconSize: L.circle()});
             }
         });
-        getLocation();
         $.getJSON("data.json", function(jsondata) {
             let likesMax = 0;
             let years = [];
@@ -124,28 +125,6 @@
             document.getElementById("years").value = yearMin;
             updateYears();
         });
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            }
-        }
-
-        function showPosition(position) {
-            var marker = L.circleMarker([position.coords.latitude,position.coords.longitude], {
-                color: '#ff0000',
-                radius: 10
-            }).bindPopup('This is your current location.');
-            markerCurrentLocationLayer.addLayer(marker);
-            markerCurrentLocationLayer.addTo(map);
-            // If current location falls within bounds of Portland, pan there.
-            if (position.coords.latitude < 45.687769
-                && position.coords.latitude > 45.254888
-                && position.coords.longitude > -122.987921
-                && position.coords.longitude < -122.203901) {
-                map.panTo(new L.LatLng(position.coords.latitude, position.coords.longitude));
-            }
-        }
 
         function updateLikes() {
             updateMarkers();
@@ -184,10 +163,12 @@
             });
             markersLayer.addTo(map);
         }
+
         var layer = new L.StamenTileLayer("toner-hybrid");
         map = new L.Map("map", {
             minZoom: 11,
             maxZoom: 18,
+            maxBounds: [[44.967039, -121.571015],[45.957886, -123.397505]],
             renderer: L.canvas(),
             preferCanvas: true,
             zoomAnimation: false,
@@ -198,6 +179,17 @@
         map.on('popupopen', function() {
             gtag('event', 'click', { 'event_category': 'popup' });
         });
+        let lc = L.control.locate({
+            position: 'topleft',
+            setView: 'once',
+            flyTo: true,
+            keepCurrentZoomLevel: true,
+            showPopup: false,
+            strings: {
+                title: "Show my location on the map.",
+                outsideMapBoundsMsg: "Your location is outside of Portland and can not be used.",
+            }
+        }).addTo(map);
     </script>
 </body>
 </html>
