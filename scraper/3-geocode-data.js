@@ -14,15 +14,19 @@ async function run() {
         if (post.text.length > 5 && post.latlong == undefined && post.date.substring(0,4) == "2019") {
             counter = counter + 1
             let text = post.text;
+            // Filter html tags
+            text = text.replace(/<\/?[^>]+(>|$)/g, "");
+            // Filter efiles specific way of writing.
+            text = text.replace(/ looking (north|northwest|northeast|south|southwest|southeast|east|west) (to|towards) /gi, ' '); // is this case sensitive? we don't want it to.
             text = text.replace(/… More/g, ' ');
             text = text.replace(/#/g, ', ');
             text = text.replace(/\n/g, ', ');
             if (!text.includes("&")) {
                 // If there is no ampersand, we assume ' and ' is for the cross streets. Google seems to do better with ampersands.
-                text = text.replace(/ and /g, ' & ');
+                text = text.replace(/ and /gi, ' & ');
             }
-            text = text.replace(/ near /g, ' & ');
-            text = text.replace(/ between /g, ' & ');
+            text = text.replace(/ near /gi, ' & ');
+            text = text.replace(/ between /gi, ' & ');
             text = text.replace(/[^A-Za-z0-9 ,&]/g, " ");
             text = text.replace(/\s+/g, ' ').trim()
             const url = url_prefix + encodeURIComponent(text) + encodeURI(url_suffix);

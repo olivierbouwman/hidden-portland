@@ -95,7 +95,7 @@
                 return L.divIcon({ html: cluster.getChildCount(), className: 'circle', iconSize: L.circle()});
             }
         });
-        $.getJSON("data.json", function(jsondata) {
+        $.getJSON("data-efiles.json", function(jsondata) {
             let likesMax = 0;
             let years = [];
             $.each(jsondata, function(index, element) {
@@ -153,9 +153,14 @@
                     // Only load markers that match our search term.
                     if (search.length === 0 || (search.length > 0 && element.text.toLowerCase().includes(search.toLowerCase()))) {
                         // Only load markers that match our minimum number of likes.
-                        if (Number(element.likes) >= document.getElementById('likes').value) {
+                        if (!element.likes || Number(element.likes) >= document.getElementById('likes').value) {
                             // Create marker.
-                            var marker = L.marker([element.latlong.lat,element.latlong.lng]).bindPopup('Likes: ' + element.likes + ' / Date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
+                            // if (element.source == "efiles") {
+                                var marker = L.marker([element.latlong.lat,element.latlong.lng]).bindPopup('City of Portland Efiles / Date: ' + element.date + '<br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + element.id + '"><img src="https://efiles.portlandoregon.gov/Record/' + element.id + '/File/Thumbnail"><br>' + element.text + '</a>');
+                            // }
+                            // else {
+                            //     var marker = L.marker([element.latlong.lat,element.latlong.lng]).bindPopup('Likes: ' + element.likes + ' / Date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
+                            // }
                             markersLayer.addLayer(marker);
                         }
                     }
