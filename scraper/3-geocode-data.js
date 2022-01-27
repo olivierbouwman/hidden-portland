@@ -23,6 +23,8 @@ async function run() {
                 text = text.replace(/<\/?[^>]+(>|$)/g, ", ");
                 text = text.replace(/ looking (north|northwest|northeast|south|southwest|southeast|east|west) (to|towards|from) /gi, ' & ');
                 text = text.replace(/ just (north|northwest|northeast|south|southwest|southeast|east|west) (of) /gi, ' & ');
+                text = text.replace(/ (north|northwest|northeast|south|southwest|southeast|east|west) of /gi, ' & ');
+                text = text.replace(/ at /gi, ' & ');
             // }
             // if (post.source == "hp") {
             text = text.replace(/… More/g, ' ');
@@ -76,4 +78,3 @@ function processRecord(post, url) {
         });
     });
 }
-
