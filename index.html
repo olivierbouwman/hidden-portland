@@ -143,6 +143,23 @@
             gtag('event', 'search', { 'search_term': document.getElementById('search').value });
         }
 
+        // sendData("hp_12346_45.123_-122.123");
+        function sendData2(data) {
+            fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLSfMNlzh3Al0m_Mj-qd11_ru5cBB-e0KbDsq6_fhtYUhgngSVw/formResponse', {
+                method: 'POST',
+                mode: 'no-cors', // we're using no-cors so we don't have access to the response (https://developer.mozilla.org/en-US/docs/Web/API/Request/mode).
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body: "entry.74105857=" + data
+            }).then(function (response) {
+                console.log('sent but no idea if things worked out because of no-cors');
+                return response.text();
+            }).catch(function (err) {
+                console.warn('error, internet connection is probably down.', err);
+            });
+        }
+
         function updateMarkers() {
             // Clear all markers.
             markersLayer.clearLayers();
