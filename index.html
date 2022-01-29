@@ -206,7 +206,7 @@
                         // Only load markers that match our minimum number of likes.
                         if (Number(element.likes) >= document.getElementById('likes').value) {
                             // Create marker.
-                            var marker = L.marker([element.latlong.lat,element.latlong.lng], {"data-title":"test1"}).bindPopup('Likes: ' + element.likes + ' / Date: ' + element.date + ' / <a href="#" onclick="fixLocation(' + element.id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
+                            var marker = L.marker([element.latlong.lat,element.latlong.lng]).bindPopup('Likes: ' + element.likes + ' / Date: ' + element.date + ' / <a href="#" onclick="fixLocation(' + element.id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
                             markersLayer.addLayer(marker);
                             markers[element.id] = marker;
                         }
