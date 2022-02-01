@@ -4,8 +4,8 @@ jobs:
   Map-Corrections:
     runs-on: ubuntu-latest
     steps:
+      - run: wget --output-document=corrections.json https://sheets.googleapis.com/v4/spreadsheets/18cdpyaJjKSKq4rvW2XKQisAavf_tdYoWL0TQKZRVX_k/values/Form%20Responses%201?alt=json&key=${{ secrets.GOOGLE_SHEETS_API_KEY }}
       - run: |
-        wget --output-document=corrections.json https://sheets.googleapis.com/v4/spreadsheets/18cdpyaJjKSKq4rvW2XKQisAavf_tdYoWL0TQKZRVX_k/values/Form%20Responses%201?alt=json&key=${{ secrets.GOOGLE_SHEETS_API_KEY }}
         jq --version
         jq '[.values[] | last | split("_") | {(nth(0)): {(nth(1)): {lc:(nth(2) + "," + nth(3))}}} ] | del(.[0]) | .[]' corrections.json > corrections-jq.json
         jq -s '.[0] * .[1]' data-jq-test.json corrections-jq.json > data-corrections.json
