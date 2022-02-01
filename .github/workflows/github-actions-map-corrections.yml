@@ -1,5 +1,5 @@
 name: Map Corrections
-on: [workflow_dispatch]
+on: [push]
 jobs:
   Map-Corrections:
     runs-on: ubuntu-latest
