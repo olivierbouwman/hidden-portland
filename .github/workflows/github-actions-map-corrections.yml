@@ -1,17 +1,19 @@
-name: GitHub Actions Demo
+name: Map Corrections
 on: [push]
 jobs:
-  Get-Map-Corrections:
+  Map-Corrections:
     runs-on: ubuntu-latest
     steps:
-      - name: wget
-        uses: wei/wget@v1
-        with:
-          args: --output-document=corrections.json https://sheets.googleapis.com/v4/spreadsheets/18cdpyaJjKSKq4rvW2XKQisAavf_tdYoWL0TQKZRVX_k/values/Form%20Responses%201?alt=json&key=${{ secrets.GOOGLE_SHEETS_API_KEY }}
-
+#      - name: wget
+#        uses: wei/wget@v1
+#        with:
+#          args: --output-document=corrections.json https://sheets.googleapis.com/v4/spreadsheets/18cdpyaJjKSKq4rvW2XKQisAavf_tdYoWL0TQKZRVX_k/values/Form%20Responses%201?alt=json&key=${{ secrets.GOOGLE_SHEETS_API_KEY }}
+      - run: |
+        echo "`wget --output-document=corrections.json https://sheets.googleapis.com/v4/spreadsheets/18cdpyaJjKSKq4rvW2XKQisAavf_tdYoWL0TQKZRVX_k/values/Form%20Responses%201?alt=json&key=${{ secrets.GOOGLE_SHEETS_API_KEY }}`
+        echo "`jq '[.values[] | last | split("_") | {(nth(0)): {(nth(1)): {lc:(nth(2) + "," + nth(3))}}} ] | del(.[0]) | .[]' corrections.json`" > corrections-jq.json
+        echo "`jq -s '.[0] * .[1]' data-jq-test.json corrections-jq.json`" > data-corrections.json
 #     jq    [.values[] | last | split("_") | {(nth(0)): {(nth(1)): {lc:(nth(2) + "," + nth(3))}}} ] | del(.[0]) | .[]
 #     jq    jq -s '.[0] * .[1]' data-jq-test.json corrections-jq.json
-
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
