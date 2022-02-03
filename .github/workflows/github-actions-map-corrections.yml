@@ -15,7 +15,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-      - run: wget --output-document=corrections.json https://sheets.googleapis.com/v4/spreadsheets/18cdpyaJjKSKq4rvW2XKQisAavf_tdYoWL0TQKZRVX_k/values/Form%20Responses%201?alt=json\&key=AIzaSyAA6HeKSIaUzk7pmYMzE-P6Jbm4cBEywpI
+      - run: wget --output-document=corrections.json https://sheets.googleapis.com/v4/spreadsheets/18cdpyaJjKSKq4rvW2XKQisAavf_tdYoWL0TQKZRVX_k/values/Form%20Responses%201?alt=json\&key=${{ secrets.GOOGLE_SHEETS_API_KEY }}
       - name: jq
         run: |
           jq --version
