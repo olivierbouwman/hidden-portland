@@ -1,5 +1,7 @@
 name: Map Corrections
-on: [push]
+on:
+  schedule:
+    - cron: "*/15 * * * *"
 jobs:
   Map-Corrections:
     runs-on: ubuntu-latest
