@@ -16,5 +16,5 @@ jobs:
           git config --global user.name "olivierbouwman"
           git config --global user.email "olivier.bouwman@gmail.com"
           git add data-corrections.json
-          git commit -m "Add latest corrections to data file."
+          git commit -m "Add latest corrections to data file." || true
           git push
