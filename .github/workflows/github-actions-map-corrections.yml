@@ -21,4 +21,4 @@ jobs:
           jq --version
           jq '[.values[] | last | split("_") | {(nth(0)): {(nth(1)): {lc:(nth(2) + "," + nth(3))}}} ] | del(.[0]) | .[]' corrections.json > corrections-jq.json
           jq -s '.[0] * .[1]' data.json corrections-jq.json > data-corrections.json
-          ls .
+          ls -laF .
