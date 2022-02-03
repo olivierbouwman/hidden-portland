@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="leaflet/Locate/L.Control.Locate.css" />
     <script src="jquery-3.6.0.min.js"></script>
     <script src="leaflet/leaflet.js"></script>
-    <script src='leaflet/MarkerCluster/leaflet.markercluster-src.js'></script>
+    <script src='leaflet/MarkerCluster/leaflet.markercluster.js'></script>
     <script src="leaflet/Locate/L.Control.Locate.min.js"></script>
     <script src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-G1HN96YZ99"></script>
@@ -86,8 +86,8 @@
         var mapData = [];
         var map;
         var markers = [];
-        var markersMovedLocationLayer = new L.LayerGroup();
-        var markersLayer = L.markerClusterGroup({
+        const unclustered = new L.featureGroup();
+        var clustered = L.markerClusterGroup({
             showCoverageOnHover: false,
             zoomToBoundsOnClick: true,
             spiderfyOnMaxZoom: true,
@@ -119,7 +119,7 @@
                 let sourceId = index;
                 $.each(source, function(id, element) {
                     // Lots of items end up here that are not located properly, filter them out.
-                    if (element.l == undefined || element.l == "0" || element.l == "45.515232,-122.6783853") {
+                    if ((element.lc == undefined && element.l == undefined) || (element.l == "0" && element.lc == undefined) || (element.l == "45.515232,-122.6783853" && element.lc == undefined)) {
                         // Todo: when we delete an item, do we skip over the next one? Might want to refactor this.
                         delete(mapData[sourceId][id]);
                         return true;
@@ -162,7 +162,8 @@
         }
 
         function fixLocation(id) {
-            console.log(id);
+            clustered.removeLayer(markers[id]);
+            unclustered.addLayer(markers[id]);
             let popupContent = markers[id].getPopup().getContent();
             popupContent = popupContent.replace(/<a href="#"(.*?\<\/a>)/, '<a href="#" onclick="fixLocationFinish(' + id + ')"><br><strong>Drag this marker to the correct location and click here to submit your correction.</strong></a>');
             markers[id].getPopup().setContent(popupContent);
@@ -173,11 +174,10 @@
 
         function fixLocationFinish(id) {
             let popupContent = markers[id].getPopup().getContent();
-            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a>)/, '<a href="#" onclick="fixLocation(' + id + ')"><br><strong>Thank you for your fix! It will take a couple hours to process your submission.</strong></a>');
+            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a>)/, '<a href="#" onclick="fixLocation(' + id + ')"><br><strong>Thank you for your fix! It will take about 15 minutes before your update shows up for other people.</strong></a>');
             markers[id].getPopup().setContent(popupContent);
             let lat = markers[id].getLatLng().lat;
             let lng = markers[id].getLatLng().lng;
-            console.log("hp_" + id + "_" + lat + "_" + lng);
             submitFixedLocation("hidden-portland_" + id + "_" + lat + "_" + lng);
         }
 
@@ -190,16 +190,16 @@
                 },
                 body: "entry.74105857=" + data
             }).then(function (response) {
-                console.log('sent but no idea if things worked out because of no-cors');
+                // console.log('sent but no idea if things worked out because of no-cors');
                 return response.text();
             }).catch(function (err) {
-                console.warn('error, internet connection is probably down.', err);
+                // console.warn('error, internet connection is probably down.', err);
             });
         }
 
         function updateMarkers() {
             // Clear all markers.
-            markersLayer.clearLayers();
+            clustered.clearLayers();
             var search = document.getElementById('search').value;
             // $.each(mapData, function(index, element) {
             $.each(mapData, function(index, source) {
@@ -211,20 +211,24 @@
                             // Only load markers that match our minimum number of likes.
                             if (Number(element.r) >= document.getElementById('likes').value) {
                                 // Create marker.
-                                let lat = element.l.toString().split(",")[0];
-                                let lng = element.l.toString().split(",")[1];
-                                if (lat.length < 3 || lng.length < 3) {
-                                    console.log(id);
+                                let location;
+                                if (element.lc !== undefined) {
+                                    location = element.lc;
                                 }
+                                else {
+                                    location = element.l;
+                                }
+                                let lat = location.toString().split(",")[0];
+                                let lng = location.toString().split(",")[1];
                                 var marker = L.marker([lat,lng]).bindPopup('Likes: ' + element.r + ' / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
-                                markersLayer.addLayer(marker);
+                                clustered.addLayer(marker);
                                 markers[id] = marker;
                             }
                         }
                     }
                 });
             });
-            markersLayer.addTo(map);
+            clustered.addTo(map);
         }
 
         var layer = new L.StamenTileLayer("toner-hybrid");
@@ -239,6 +243,7 @@
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         }).setView([45.5230313, -122.6659288], 14);
         map.addLayer(layer);
+        map.addLayer(unclustered);
         map.on('popupopen', function() {
             gtag('event', 'click', { 'event_category': 'popup' });
         });
