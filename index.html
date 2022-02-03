@@ -80,7 +80,7 @@
         <label for="years" id="years-label"><span id="years-text">Years (starting at 0)</span><input name="years" id="years" type="range" min="0" max="0" onchange="updateYears();"></label>
         <label for="likes" id="likes-label"><span id="likes-text">Likes (at least 0)</span><input name="likes" id="likes" type="range" min="0" max="10" onchange="updateLikes();"></label>
         <label for="search">Search <input name="search" id="search" type="text" onchange="updateSearch()"></label>
-        <span class="text">This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a>. More info about this map on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</span>
+        <span class="text">This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a> and <a target="_blank" href="https://efiles.portlandoregon.gov/">the Portland Archives</a>.<br>More info about this map on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</span>
     </div>
     <script>
         var mapData = [];
@@ -97,7 +97,7 @@
             }
         });
 
-        var markerIcon = L.Icon.extend({
+        var markerIconPink = L.Icon.extend({
             options: {
                 iconUrl:       'leaflet/images/marker-icon-pink.png',
                 iconRetinaUrl: 'leaflet/images/marker-icon-pink-2x.png',
@@ -109,7 +109,20 @@
                 shadowSize:  [41, 41]
             },
         });
-        var pinkIcon = new markerIcon();
+        var pinkIcon = new markerIconPink();
+        var markerIconGrey = L.Icon.extend({
+            options: {
+                iconUrl:       'leaflet/images/marker-icon-grey.png',
+                iconRetinaUrl: 'leaflet/images/marker-icon-grey-2x.png',
+                shadowUrl:     'leaflet/images/marker-shadow.png',
+                iconSize:    [25, 41],
+                iconAnchor:  [12, 41],
+                popupAnchor: [1, -34],
+                tooltipAnchor: [16, -28],
+                shadowSize:  [41, 41]
+            },
+        });
+        var greyIcon = new markerIconGrey();
 
         $.getJSON("data.json", function(jsondata) {
             mapData = jsondata
@@ -124,13 +137,15 @@
                         delete(mapData[sourceId][id]);
                         return true;
                     }
-                    // Find all years.
-                    if (Number.isInteger(Number(element.d.substring(0,4))) && years.indexOf(element.d.substring(0,4)) === -1) {
-                        years.push(element.d.substring(0,4));
-                    }
-                    // Find highest number of likes.
-                    if (!isNaN(Number(element.r))) {
-                        likesMax = Math.max(likesMax, Number(element.r));
+                    if (sourceId == "hidden-portland") {
+                        // Find all years.
+                        if (Number.isInteger(Number(element.d.substring(0,4))) && years.indexOf(element.d.substring(0,4)) === -1) {
+                            years.push(element.d.substring(0,4));
+                        }
+                        // Find highest number of likes.
+                        if (!isNaN(Number(element.r))) {
+                            likesMax = Math.max(likesMax, Number(element.r));
+                        }
                     }
                 });
             });
@@ -179,7 +194,17 @@
             markers[id].getPopup().setContent(popupContent);
             let lat = markers[id].getLatLng().lat;
             let lng = markers[id].getLatLng().lng;
-            submitFixedLocation("hidden-portland_" + id + "_" + lat + "_" + lng);
+            let source;
+            if (mapData['hidden-portland'][id] !== undefined) {
+                source = "hidden-portland";
+            }
+            else if (mapData['portland-archives'][id] !== undefined) {
+                source = "portland-archives";
+            }
+            else {
+                return;
+            }
+            submitFixedLocation(source + "_" + id + "_" + lat + "_" + lng);
         }
 
         function submitFixedLocation(data) {
@@ -203,13 +228,14 @@
             clustered.clearLayers();
             var search = document.getElementById('search').value;
             $.each(mapData, function(index, source) {
+                let sourceId = index;
                 $.each(source, function (id, element) {
                     // Only load markers for selected years.
-                    if (Number(element.d.substring(0, 4)) >= document.getElementById('years').value) {
+                    if (sourceId == "portland-archives" || Number(element.d.substring(0, 4)) >= document.getElementById('years').value) {
                         // Only load markers that match our search term.
                         if (search.length === 0 || (search.length > 0 && element.t.toLowerCase().includes(search.toLowerCase()))) {
                             // Only load markers that match our minimum number of likes.
-                            if (Number(element.r) >= document.getElementById('likes').value) {
+                            if (!element.r || Number(element.r) >= document.getElementById('likes').value) {
                                 // Create marker.
                                 let location;
                                 if (element.lc !== undefined) {
@@ -220,7 +246,13 @@
                                 }
                                 let lat = location.toString().split(",")[0];
                                 let lng = location.toString().split(",")[1];
-                                var marker = L.marker([lat,lng]).bindPopup('Likes: ' + element.r + ' / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
+                                if (sourceId == "portland-archives") {
+                                    var marker = L.marker([lat,lng]).bindPopup('Portland Archives / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + id + '"><img src="https://efiles.portlandoregon.gov/Record/' + id + '/File/Thumbnail"><br>' + element.t + '</a>');
+                                    marker.setIcon(greyIcon);
+                                }
+                                else {
+                                    var marker = L.marker([lat,lng]).bindPopup('Hidden Portland / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
+                                }
                                 clustered.addLayer(marker);
                                 markers[id] = marker;
                             }
