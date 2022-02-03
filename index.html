@@ -97,7 +97,7 @@
             }
         });
 
-        var markerIcon = L.Icon.extend({
+        var markerIconPink = L.Icon.extend({
             options: {
                 iconUrl:       'leaflet/images/marker-icon-pink.png',
                 iconRetinaUrl: 'leaflet/images/marker-icon-pink-2x.png',
@@ -109,7 +109,20 @@
                 shadowSize:  [41, 41]
             },
         });
-        var pinkIcon = new markerIcon();
+        var pinkIcon = new markerIconPink();
+        var markerIconGrey = L.Icon.extend({
+            options: {
+                iconUrl:       'leaflet/images/marker-icon-grey.png',
+                iconRetinaUrl: 'leaflet/images/marker-icon-grey-2x.png',
+                shadowUrl:     'leaflet/images/marker-shadow.png',
+                iconSize:    [25, 41],
+                iconAnchor:  [12, 41],
+                popupAnchor: [1, -34],
+                tooltipAnchor: [16, -28],
+                shadowSize:  [41, 41]
+            },
+        });
+        var greyIcon = new markerIconGrey();
 
         $.getJSON("data.json", function(jsondata) {
             mapData = jsondata
@@ -179,23 +192,34 @@
             markers[id].getPopup().setContent(popupContent);
             let lat = markers[id].getLatLng().lat;
             let lng = markers[id].getLatLng().lng;
-            submitFixedLocation("hidden-portland_" + id + "_" + lat + "_" + lng);
+            let source;
+            if (mapData['hidden-portland'][id] !== undefined) {
+                source = "hidden-portland";
+            }
+            else if (mapData['portland-archives'][id] !== undefined) {
+                source = "portland-archives";
+            }
+            else {
+                return;
+            }
+            submitFixedLocation(source + "_" + id + "_" + lat + "_" + lng);
         }
 
         function submitFixedLocation(data) {
-            fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLSfMNlzh3Al0m_Mj-qd11_ru5cBB-e0KbDsq6_fhtYUhgngSVw/formResponse', {
-                method: 'POST',
-                mode: 'no-cors', // we're using no-cors so we don't have access to the response (https://developer.mozilla.org/en-US/docs/Web/API/Request/mode).
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                },
-                body: "entry.74105857=" + data
-            }).then(function (response) {
-                // console.log('sent but no idea if things worked out because of no-cors');
-                return response.text();
-            }).catch(function (err) {
-                // console.warn('error, internet connection is probably down.', err);
-            });
+            console.log(data);
+            // fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLSfMNlzh3Al0m_Mj-qd11_ru5cBB-e0KbDsq6_fhtYUhgngSVw/formResponse', {
+            //     method: 'POST',
+            //     mode: 'no-cors', // we're using no-cors so we don't have access to the response (https://developer.mozilla.org/en-US/docs/Web/API/Request/mode).
+            //     headers: {
+            //         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            //     },
+            //     body: "entry.74105857=" + data
+            // }).then(function (response) {
+            //     // console.log('sent but no idea if things worked out because of no-cors');
+            //     return response.text();
+            // }).catch(function (err) {
+            //     // console.warn('error, internet connection is probably down.', err);
+            // });
         }
 
         function updateMarkers() {
@@ -203,6 +227,7 @@
             clustered.clearLayers();
             var search = document.getElementById('search').value;
             $.each(mapData, function(index, source) {
+                let sourceId = index;
                 $.each(source, function (id, element) {
                     // Only load markers for selected years.
                     if (Number(element.d.substring(0, 4)) >= document.getElementById('years').value) {
@@ -220,12 +245,13 @@
                                 }
                                 let lat = location.toString().split(",")[0];
                                 let lng = location.toString().split(",")[1];
-                                // if (element.source == "efiles") {
-                                var marker = L.marker([element.latlong.lat,element.latlong.lng]).bindPopup('City of Portland Efiles / Date: ' + element.date + '<br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + element.id + '"><img src="https://efiles.portlandoregon.gov/Record/' + element.id + '/File/Thumbnail"><br>' + element.text + '</a>');
-                                // }
-                                // else {
-                                //     var marker = L.marker([lat,lng]).bindPopup('Likes: ' + element.r + ' / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
-                                // }
+                                if (sourceId == "portland-archives") {
+                                    var marker = L.marker([lat,lng]).bindPopup('Portland Archives / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + id + '"><img src="https://efiles.portlandoregon.gov/Record/' + id + '/File/Thumbnail"><br>' + element.t + '</a>');
+                                    marker.setIcon(greyIcon);
+                                }
+                                else {
+                                    var marker = L.marker([lat,lng]).bindPopup('Likes: ' + element.r + ' / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
+                                }
                                 clustered.addLayer(marker);
                                 markers[id] = marker;
                             }
