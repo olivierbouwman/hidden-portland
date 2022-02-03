@@ -1,0 +1,24 @@
+name: Map Corrections
+on:
+  schedule:
+    - cron: '15 * * * *'
+jobs:
+  Map-Corrections:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Get corrections from Google Forms API
+        run: wget --output-document=corrections.json https://sheets.googleapis.com/v4/spreadsheets/18cdpyaJjKSKq4rvW2XKQisAavf_tdYoWL0TQKZRVX_k/values/Form%20Responses%201?alt=json\&key=${{ secrets.GOOGLE_SHEETS_API_KEY }}
+      - name: Add corrections to data file
+        run: |
+          jq '[.values[]] | sort | reverse | [.[] | last | split("_") | {(nth(0)): {(nth(1)): {lc:(nth(2) + "," + nth(3))}}}] | del(.[0]) | .[]' corrections.json > corrections-jq.json
+          jq -n 'reduce inputs as $i ({}; . * $i)' data.json corrections-jq.json > data-corrections.json
+          mv data-corrections.json data.json
+      - name: Commit and push updated data file
+        run: |
+          git config --global user.name "olivierbouwman"
+          git config --global user.email "olivier.bouwman@gmail.com"
+          git add data.json
+          git commit -m "Add latest corrections to data file." || true
+          git push

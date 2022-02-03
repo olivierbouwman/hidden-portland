@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="leaflet/MarkerCluster/MarkerCluster.css" />
     <link rel="stylesheet" href="leaflet/MarkerCluster/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="leaflet/Locate/L.Control.Locate.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="jquery-3.6.0.min.js"></script>
     <script src="leaflet/leaflet.js"></script>
     <script src='leaflet/MarkerCluster/leaflet.markercluster.js'></script>
     <script src="leaflet/Locate/L.Control.Locate.min.js"></script>
@@ -85,8 +85,9 @@
     <script>
         var mapData = [];
         var map;
-        var markerCurrentLocationLayer = new L.LayerGroup();
-        var markersLayer = L.markerClusterGroup({
+        var markers = [];
+        var unclustered = new L.featureGroup();
+        var clustered = L.markerClusterGroup({
             showCoverageOnHover: false,
             zoomToBoundsOnClick: true,
             spiderfyOnMaxZoom: true,
@@ -95,26 +96,43 @@
                 return L.divIcon({ html: cluster.getChildCount(), className: 'circle', iconSize: L.circle()});
             }
         });
+
+        var markerIcon = L.Icon.extend({
+            options: {
+                iconUrl:       'leaflet/images/marker-icon-pink.png',
+                iconRetinaUrl: 'leaflet/images/marker-icon-pink-2x.png',
+                shadowUrl:     'leaflet/images/marker-shadow.png',
+                iconSize:    [25, 41],
+                iconAnchor:  [12, 41],
+                popupAnchor: [1, -34],
+                tooltipAnchor: [16, -28],
+                shadowSize:  [41, 41]
+            },
+        });
+        var pinkIcon = new markerIcon();
+
         $.getJSON("data.json", function(jsondata) {
+            mapData = jsondata
             let likesMax = 0;
             let years = [];
-            $.each(jsondata, function(index, element) {
-                if (element.latlong !== undefined && element.latlong.lat !== undefined) {
+            $.each(jsondata, function(index, source) {
+                let sourceId = index;
+                $.each(source, function(id, element) {
                     // Lots of items end up here that are not located properly, filter them out.
-                    if (element.latlong.lat == 45.515232 && element.latlong.lng == -122.6783853) {
-                        return;
+                    if ((element.lc == undefined && element.l == undefined) || (element.l == "0" && element.lc == undefined) || (element.l == "45.515232,-122.6783853" && element.lc == undefined)) {
+                        // Todo: when we delete an item, do we skip over the next one? Might want to refactor this.
+                        delete(mapData[sourceId][id]);
+                        return true;
                     }
-                    // We can map this, add it to our list.
-                    mapData.push(element);
                     // Find all years.
-                    if (Number.isInteger(Number(element.date.substring(0,4))) && years.indexOf(element.date.substring(0,4)) === -1) {
-                        years.push(element.date.substring(0,4));
+                    if (Number.isInteger(Number(element.d.substring(0,4))) && years.indexOf(element.d.substring(0,4)) === -1) {
+                        years.push(element.d.substring(0,4));
                     }
                     // Find highest number of likes.
-                    if (!isNaN(Number(element.likes))) {
-                        likesMax = Math.max(likesMax, Number(element.likes));
+                    if (!isNaN(Number(element.r))) {
+                        likesMax = Math.max(likesMax, Number(element.r));
                     }
-                }
+                });
             });
             let yearMin = Math.min(...years);
             let yearMax = Math.max(...years);
@@ -143,25 +161,73 @@
             gtag('event', 'search', { 'search_term': document.getElementById('search').value });
         }
 
+        function fixLocation(id) {
+            clustered.removeLayer(markers[id]);
+            unclustered.addLayer(markers[id]);
+            let popupContent = markers[id].getPopup().getContent();
+            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a>)/, '<a href="#" onclick="fixLocationFinish(' + id + ')"><br><strong>Drag this marker to the correct location and click here to submit your correction.</strong></a>');
+            markers[id].getPopup().setContent(popupContent);
+            markers[id].dragging.enable();
+            markers[id].setIcon(pinkIcon);
+            markers[id].off('dragend');
+        }
+
+        function fixLocationFinish(id) {
+            let popupContent = markers[id].getPopup().getContent();
+            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a>)/, '<a href="#" onclick="fixLocation(' + id + ')"><br><strong>Thank you for your fix! It will take about 15 minutes before your update shows up for other people.</strong></a>');
+            markers[id].getPopup().setContent(popupContent);
+            let lat = markers[id].getLatLng().lat;
+            let lng = markers[id].getLatLng().lng;
+            submitFixedLocation("hidden-portland_" + id + "_" + lat + "_" + lng);
+        }
+
+        function submitFixedLocation(data) {
+            fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLSfMNlzh3Al0m_Mj-qd11_ru5cBB-e0KbDsq6_fhtYUhgngSVw/formResponse', {
+                method: 'POST',
+                mode: 'no-cors', // we're using no-cors so we don't have access to the response (https://developer.mozilla.org/en-US/docs/Web/API/Request/mode).
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body: "entry.74105857=" + data
+            }).then(function (response) {
+                // console.log('sent but no idea if things worked out because of no-cors');
+                return response.text();
+            }).catch(function (err) {
+                // console.warn('error, internet connection is probably down.', err);
+            });
+        }
+
         function updateMarkers() {
             // Clear all markers.
-            markersLayer.clearLayers();
+            clustered.clearLayers();
             var search = document.getElementById('search').value;
-            $.each(mapData, function(index, element) {
-                // Only load markers for selected years.
-                if (Number(element.date.substring(0,4)) >= document.getElementById('years').value) {
-                    // Only load markers that match our search term.
-                    if (search.length === 0 || (search.length > 0 && element.text.toLowerCase().includes(search.toLowerCase()))) {
-                        // Only load markers that match our minimum number of likes.
-                        if (Number(element.likes) >= document.getElementById('likes').value) {
-                            // Create marker.
-                            var marker = L.marker([element.latlong.lat,element.latlong.lng]).bindPopup('Likes: ' + element.likes + ' / Date: ' + element.date + '<br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + element.id + '">' + element.text + '</a>');
-                            markersLayer.addLayer(marker);
+            $.each(mapData, function(index, source) {
+                $.each(source, function (id, element) {
+                    // Only load markers for selected years.
+                    if (Number(element.d.substring(0, 4)) >= document.getElementById('years').value) {
+                        // Only load markers that match our search term.
+                        if (search.length === 0 || (search.length > 0 && element.t.toLowerCase().includes(search.toLowerCase()))) {
+                            // Only load markers that match our minimum number of likes.
+                            if (Number(element.r) >= document.getElementById('likes').value) {
+                                // Create marker.
+                                let location;
+                                if (element.lc !== undefined) {
+                                    location = element.lc;
+                                }
+                                else {
+                                    location = element.l;
+                                }
+                                let lat = location.toString().split(",")[0];
+                                let lng = location.toString().split(",")[1];
+                                var marker = L.marker([lat,lng]).bindPopup('Likes: ' + element.r + ' / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
+                                clustered.addLayer(marker);
+                                markers[id] = marker;
+                            }
                         }
                     }
-                }
+                });
             });
-            markersLayer.addTo(map);
+            clustered.addTo(map);
         }
 
         var layer = new L.StamenTileLayer("toner-hybrid");
@@ -176,6 +242,7 @@
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         }).setView([45.5230313, -122.6659288], 14);
         map.addLayer(layer);
+        map.addLayer(unclustered);
         map.on('popupopen', function() {
             gtag('event', 'click', { 'event_category': 'popup' });
         });
