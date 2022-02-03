@@ -22,9 +22,9 @@ jobs:
           jq -s '.[0] * .[1]' data.json corrections-jq.json > data-corrections.json
           ls -laF .
       - name: Commit and push new data file
-          run: |
-            git config --global user.name "olivierbouwman"
-            git config --global user.email "olivier.bouwman@gmail.com"
-            git add data-corrections.json
-            git commit -m "Add latest corrections to data file."
-            git push
+        run: |
+          git config --global user.name "olivierbouwman"
+          git config --global user.email "olivier.bouwman@gmail.com"
+          git add data-corrections.json
+          git commit -m "Add latest corrections to data file."
+          git push
