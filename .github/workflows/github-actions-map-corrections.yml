@@ -14,10 +14,11 @@ jobs:
         run: |
           jq '[.values[]] | sort | reverse | [.[] | last | split("_") | {(nth(0)): {(nth(1)): {lc:(nth(2) + "," + nth(3))}}}] | del(.[0]) | .[]' corrections.json > corrections-jq.json
           jq -n 'reduce inputs as $i ({}; . * $i)' data.json corrections-jq.json > data-corrections.json
+          mv data-corrections.json data.json
       - name: Commit and push updated data file
         run: |
           git config --global user.name "olivierbouwman"
           git config --global user.email "olivier.bouwman@gmail.com"
-          git add data-corrections.json
+          git add data.json
           git commit -m "Add latest corrections to data file." || true
           git push
