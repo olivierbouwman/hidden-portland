@@ -170,6 +170,7 @@
             markers[id].dragging.enable();
             markers[id].setIcon(pinkIcon);
             markers[id].off('dragend');
+            markers[id].openPopup();
         }
 
         function fixLocationFinish(id) {
