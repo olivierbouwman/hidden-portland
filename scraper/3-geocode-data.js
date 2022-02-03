@@ -11,7 +11,7 @@ let counterFail = 0;
 async function run() {
     for (let post of posts) {
         // Only process if it hasn't been before and also process a certain date to prevent accidental high cost.
-        if (post.text.length > 5 && post.latlong == undefined) { // && post.date.substring(0,4) == "2021") {
+        if (post.text.length > 5 && post.lat == undefined && post.date.substring(0,4) == "2019") {
             counter = counter + 1
             let text = post.text;
             // Filter efiles specific way of writing.
@@ -41,7 +41,7 @@ async function run() {
             text = text.replace(/\s+/g, ' ').trim()
             const url = url_prefix + encodeURIComponent(text) + encodeURI(url_suffix);
             post = await processRecord(post, url);
-            let aatemp = post.latlong.lat + ", " + post.latlong.lng;
+            let aatemp = post.lat + ", " + post.lng;
             fs.writeFileSync('data-efiles.json', JSON.stringify(posts, null, 2) , 'utf-8')
         }
     }
@@ -64,11 +64,12 @@ function processRecord(post, url) {
                 var response = JSON.parse(body);
                 if (response.results[0] !== undefined) {
                     console.log("Got a response: ", response.results[0].geometry.location);
-                    post.latlong = response.results[0].geometry.location;
+                    post.lat = response.results[0].geometry.location.lat;
+                    post.lng = response.results[0].geometry.location.lng;
                 }
                 else {
                     counterFail = counterFail + 1;
-                    post.latlong = "no result";
+                    post.lat = 0;
                 }
                 resolve(post);
             });
