@@ -86,7 +86,7 @@
         var mapData = [];
         var map;
         var markers = [];
-        const unclustered = new L.featureGroup();
+        var unclustered = new L.featureGroup();
         var clustered = L.markerClusterGroup({
             showCoverageOnHover: false,
             zoomToBoundsOnClick: true,
@@ -201,7 +201,6 @@
             // Clear all markers.
             clustered.clearLayers();
             var search = document.getElementById('search').value;
-            // $.each(mapData, function(index, element) {
             $.each(mapData, function(index, source) {
                 $.each(source, function (id, element) {
                     // Only load markers for selected years.
