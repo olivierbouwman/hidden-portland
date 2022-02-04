@@ -45,22 +45,58 @@
         }
         #filters {
             position: absolute;
-            right: 0;
+            left: 0px;
             top: 0;
             z-index: 500;
             background-color: rgba(255,255,255,0.8);
-            padding-bottom: 4px;
-            padding-top: 4px;
-            padding-left: 4px;
-            padding-right: 4px;
-            margin-left: 60px;
-            text-align: right;
-            max-width: 445px;
+            padding-bottom: 20px;
+            padding-top: 10px;
+            padding-left: 20px;
+            padding-right: 20px;
+            max-width: 350px;
+            transform: translateX(-600px);
+            -webkit-transform: translateX(-600px);
+        }
+        #filters h2 {
+            text-align: center;
+        }
+        #filters p {
+            line-height: 1.3;
         }
         #filters label {
             display: block;
             padding-bottom: 10px;
+            padding-left: 10px;
             white-space: nowrap;
+        }
+        #filters label span {
+            display: inline-block;
+            text-align: right;
+            width: 130px;
+            padding-left: 30px;
+            padding-right: 10px;
+        }
+        .slide-in {
+            animation: slide-in 0.5s forwards;
+            -webkit-animation: slide-in 0.5s forwards;
+        }
+        .slide-out {
+            animation: slide-out 0.5s forwards;
+            -webkit-animation: slide-out 0.5s forwards;
+        }
+        @keyframes slide-in {
+            100% { transform: translateX(0%); }
+        }
+        @-webkit-keyframes slide-in {
+            100% { -webkit-transform: translateX(0%); }
+        }
+        @keyframes slide-out {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-600px); }
+        }
+        @-webkit-keyframes slide-out {
+            0% { -webkit-transform: translateX(0%); }
+            100% { -webkit-transform: translateX(-600px); }
         }
         .circle {
             background: #2d83cb;
@@ -72,15 +108,39 @@
             align-items: center;
             justify-content: center;
         }
+        .leaflet-control-filter a {
+            cursor: pointer;
+        }
+        .leaflet-control-filter a .leaflet-control-filter-filter {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin: 5px;
+            background-color: black;
+            -webkit-mask-image: url("./leaflet/gear.svg");
+            mask-image: url("./leaflet/gear.svg");
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+        }
+        .leaflet-control-filter.active a .leaflet-control-filter-filter {
+            background-color: #2074b6;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <div id="filters">
-        <label for="years" id="years-label"><span id="years-text">Years (starting at 0)</span><input name="years" id="years" type="range" min="0" max="0" onchange="updateYears();"></label>
-        <label for="likes" id="likes-label"><span id="likes-text">Likes (at least 0)</span><input name="likes" id="likes" type="range" min="0" max="10" onchange="updateLikes();"></label>
-        <label for="search">Search <input name="search" id="search" type="text" onchange="updateSearch()"></label>
-        <span class="text">This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a> and <a target="_blank" href="https://efiles.portlandoregon.gov/">the Portland Archives</a>.<br>More info about this map on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</span>
+        <h2>Filters</h2>
+        <label for="years" id="years-label"><span id="years-text">Years (from 0)</span><input name="years" id="years" type="range" min="0" max="0" onchange="updateYears();"></label>
+        <label for="likes" id="likes-label"><span id="likes-text">Likes (> 0)</span><input name="likes" id="likes" type="range" min="0" max="10" onchange="updateLikes();"></label>
+        <label for="sources-hidden-portland" id="sources-hidden-portland-label"><span>Sources</span><input type="checkbox" value="hidden-portland" id="sources-hidden-portland" checked onchange="updateSources();">Hidden Portland</label>
+        <label for="sources-portland-archives" id="sources-portland-archives-label"><span></span><input type="checkbox" value="portland-archives" id="sources-portland-archives" checked onchange="updateSources();">Portland Archives</label>
+        <label for="search"><span>Search</span><input name="search" id="search" type="text" onchange="updateSearch()"></label>
+        <h2>Notes</h2>
+        <p>This map shows posts from <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a> and <a target="_blank" href="https://efiles.portlandoregon.gov/">the Portland Archives</a>.<br>More info about this map on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</p>
+        <p>Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.</p>
     </div>
     <script>
         var mapData = [];
@@ -137,15 +197,13 @@
                         delete(mapData[sourceId][id]);
                         return true;
                     }
-                    if (sourceId == "hidden-portland") {
-                        // Find all years.
-                        if (Number.isInteger(Number(element.d.substring(0,4))) && years.indexOf(element.d.substring(0,4)) === -1) {
-                            years.push(element.d.substring(0,4));
-                        }
-                        // Find highest number of likes.
-                        if (!isNaN(Number(element.r))) {
-                            likesMax = Math.max(likesMax, Number(element.r));
-                        }
+                    // Find all years.
+                    if (Number.isInteger(Number(element.d.substring(0,4))) && years.indexOf(element.d.substring(0,4)) === -1) {
+                        years.push(element.d.substring(0,4));
+                    }
+                    // Find highest number of likes.
+                    if (!isNaN(Number(element.r))) {
+                        likesMax = Math.max(likesMax, Number(element.r));
                     }
                 });
             });
@@ -161,14 +219,19 @@
 
         function updateLikes() {
             updateMarkers();
-            document.getElementById('likes-text').innerText = "Likes (at least " + document.getElementById('likes').value + ")";
+            document.getElementById('likes-text').innerText = "Likes (> " + document.getElementById('likes').value + ")";
             gtag('event', 'select_content', { 'content_type': 'likes', 'item_id': document.getElementById('likes').value });
         }
 
         function updateYears() {
             updateMarkers();
-            document.getElementById('years-text').innerText = "Years (starting at " + document.getElementById('years').value + ")";
+            document.getElementById('years-text').innerText = "Years (from " + document.getElementById('years').value + ")";
             gtag('event', 'select_content', { 'content_type': 'years', 'item_id': document.getElementById('years').value });
+        }
+
+        function updateSources() {
+            updateMarkers();
+            gtag('event', 'select_content', { 'content_type': 'sources' });
         }
 
         function updateSearch() {
@@ -186,6 +249,7 @@
             markers[id].setIcon(pinkIcon);
             markers[id].off('dragend');
             markers[id].openPopup();
+            gtag('event', 'select_content', { 'content_type': 'fix-start' });
         }
 
         function fixLocationFinish(id) {
@@ -205,6 +269,7 @@
                 return;
             }
             submitFixedLocation(source + "_" + id + "_" + lat + "_" + lng);
+            gtag('event', 'select_content', { 'content_type': 'fix-finish' });
         }
 
         function submitFixedLocation(data) {
@@ -230,31 +295,34 @@
             $.each(mapData, function(index, source) {
                 let sourceId = index;
                 $.each(source, function (id, element) {
-                    // Only load markers for selected years.
-                    if (sourceId == "portland-archives" || Number(element.d.substring(0, 4)) >= document.getElementById('years').value) {
-                        // Only load markers that match our search term.
-                        if (search.length === 0 || (search.length > 0 && element.t.toLowerCase().includes(search.toLowerCase()))) {
-                            // Only load markers that match our minimum number of likes.
-                            if (!element.r || Number(element.r) >= document.getElementById('likes').value) {
-                                // Create marker.
-                                let location;
-                                if (element.lc !== undefined) {
-                                    location = element.lc;
+                    if (document.getElementById('sources-' + sourceId).checked) {
+                        // Only load markers for selected years.
+                        if (Number(element.d.substring(0, 4)) >= document.getElementById('years').value) {
+                            // Only load markers that match our search term.
+                            if (search.length === 0 || (search.length > 0 && element.t.toLowerCase().includes(search.toLowerCase()))) {
+                                // Only load markers that match our minimum number of likes.
+                                if (!element.r || Number(element.r) >= document.getElementById('likes').value) {
+                                    // Get corrected location if it exists.
+                                    let location;
+                                    if (element.lc !== undefined) {
+                                        location = element.lc;
+                                    }
+                                    else {
+                                        location = element.l;
+                                    }
+                                    let lat = location.toString().split(",")[0];
+                                    let lng = location.toString().split(",")[1];
+                                    // Create marker.
+                                    if (sourceId == "portland-archives") {
+                                        var marker = L.marker([lat,lng]).bindPopup('Portland Archives / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + id + '"><img src="https://efiles.portlandoregon.gov/Record/' + id + '/File/Thumbnail"><br>' + element.t + '</a>');
+                                        marker.setIcon(greyIcon);
+                                    }
+                                    else {
+                                        var marker = L.marker([lat,lng]).bindPopup('Hidden Portland / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
+                                    }
+                                    clustered.addLayer(marker);
+                                    markers[id] = marker;
                                 }
-                                else {
-                                    location = element.l;
-                                }
-                                let lat = location.toString().split(",")[0];
-                                let lng = location.toString().split(",")[1];
-                                if (sourceId == "portland-archives") {
-                                    var marker = L.marker([lat,lng]).bindPopup('Portland Archives / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + id + '"><img src="https://efiles.portlandoregon.gov/Record/' + id + '/File/Thumbnail"><br>' + element.t + '</a>');
-                                    marker.setIcon(greyIcon);
-                                }
-                                else {
-                                    var marker = L.marker([lat,lng]).bindPopup('Hidden Portland / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
-                                }
-                                clustered.addLayer(marker);
-                                markers[id] = marker;
                             }
                         }
                     }
@@ -271,8 +339,7 @@
             renderer: L.canvas(),
             preferCanvas: true,
             zoomAnimation: false,
-            attributionControl: true,
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+            attributionControl: false,
         }).setView([45.5230313, -122.6659288], 14);
         map.addLayer(layer);
         map.addLayer(unclustered);
@@ -290,6 +357,11 @@
                 outsideMapBoundsMsg: "Your location is outside of Portland and can not be used.",
             }
         }).addTo(map);
+        $(".leaflet-control-locate.leaflet-bar.leaflet-control").after('<div class="leaflet-control-filter leaflet-bar leaflet-control"><a class="leaflet-bar-part leaflet-bar-part-single" title="Filter" href="#" id="toggle-filter"><span class="leaflet-control-filter-filter"></span></a></div>');
+        document.getElementById('toggle-filter').addEventListener('click', function() {
+            var isOpen = document.getElementById('filters').classList.contains('slide-in');
+            document.getElementById('filters').setAttribute('class', isOpen ? 'slide-out' : 'slide-in');
+        });
     </script>
 </body>
 </html>
