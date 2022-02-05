@@ -71,7 +71,7 @@
             top: 0;
             z-index: 500;
             background-color: rgba(255,255,255,0.8);
-            padding: 10px 20px 20px 50px;
+            padding: 10px 20px 20px 30px;
             transform: translateX(-600px);
             -webkit-transform: translateX(-600px);
         }
@@ -197,7 +197,7 @@
                 <a href="https://twitter.com/share?url=https://hiddenportlandforthecurious.com" target="_blank"><img width=40px height=40px src="./images/twitter.svg"></a>&nbsp;&nbsp;&nbsp;
                 <a href="https://reddit.com/submit?url=https://hiddenportlandforthecurious.com&title=Explore%20Hidden%20Portland" target="_blank"><img width=40px height=40px src="./images/reddit.svg"></a>
             </div>
-            <p class="note">Note: about a quarter of the markers are in the wrong spot due to the technical difficulty of automatically finding the correct location from a piece of text. If you feel so inclined, you can fix a marker using the "Fix location" link in each marker popup.</p>
+            <p class="note">Note: about a quarter of the markers are in the wrong spot due to the technical difficulty of automatically finding the correct location from a piece of text. If you feel so inclined, you can fix a marker by using the "Fix location" link in each marker popup.</p>
             <p class="note">Code for this map is available on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</p>
             <p class="note">Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.</p>
             <div class="center">
@@ -208,11 +208,11 @@
     <div id="map"></div>
     <div id="filters">
         <h2 class="center">Filters</h2>
-        <label for="years" id="years-label"><span id="years-text">Years (from 0)</span><input name="years" id="years" type="range" min="0" max="0" onchange="updateYears();"></label>
+        <label for="years" id="years-label"><span id="years-text">Years (> 0)</span><input name="years" id="years" type="range" min="0" max="0" onchange="updateYears();"></label>
         <label for="likes" id="likes-label"><span id="likes-text">Likes (> 0)</span><input name="likes" id="likes" type="range" min="0" max="10" onchange="updateLikes();"></label>
         <label for="sources-hidden-portland" id="sources-hidden-portland-label"><span>Sources</span><input type="checkbox" value="hidden-portland" id="sources-hidden-portland" checked onchange="updateSources();">Hidden Portland</label>
         <label for="sources-portland-archives" id="sources-portland-archives-label"><span></span><input type="checkbox" value="portland-archives" id="sources-portland-archives" checked onchange="updateSources();">Portland Archives</label>
-        <label for="search"><span>Search</span><input name="search" id="search" type="text" onchange="updateSearch()"></label>
+        <label for="search"><span>Search</span><input name="search" id="search" type="text" size="20" onchange="updateSearch()"></label>
     </div>
     <script>
         var mapData = [];
@@ -305,7 +305,7 @@
 
         function updateYears() {
             updateMarkers();
-            document.getElementById('years-text').innerText = "Years (from " + document.getElementById('years').value + ")";
+            document.getElementById('years-text').innerText = "Years (> " + document.getElementById('years').value + ")";
             gtag('event', 'select_content', { 'content_type': 'years', 'item_id': document.getElementById('years').value });
         }
 
