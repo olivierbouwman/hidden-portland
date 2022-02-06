@@ -1,6 +1,6 @@
 {
     "name": "Hidden Portland Map",
-    "start_url": "https://hiddenportlandmap.com"
+    "start_url": "https://hiddenportlandmap.com",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
