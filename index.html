@@ -209,7 +209,7 @@
             </div>
             <p class="note">Note: about a quarter of the markers are in the wrong spot due to the technical difficulty of automatically finding the correct location from a piece of text. If you feel so inclined, you can fix a marker by using the "Fix location" link in each marker popup.</p>
             <p class="note">Code for this map is available on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</p>
-            <p class="note">Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.</p>
+            <p class="note">Map tiles by <a target="_blank" href="http://stamen.com">Stamen Design</a>, under <a target="_blank" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Map data by <a target="_blank" href="http://openstreetmap.org">OpenStreetMap</a>, under <a target="_blank" href="http://www.openstreetmap.org/copyright">ODbL</a>.</p>
             <div class="center">
                 <button id="modal-close">Close</button>
             </div>
@@ -311,9 +311,9 @@
         const modal = document.getElementById("modal");
         const modalX = document.getElementById("modal-x");
         const modalClose = document.getElementById("modal-close");
-        modalX.addEventListener('click', () => modal.style.opacity = '0');
+        modalX.addEventListener('click', function(e) { modal.style.opacity = '0'; e.preventDefault(); });
         modalClose.addEventListener('click', () => modal.style.opacity = '0');
-        modal.addEventListener("click", function(e) { if($(e.target).is('#modal')) {document.getElementById("modal").style.opacity='0'} });
+        modal.addEventListener("click", function(e) { if($(e.target).is('#modal')) {document.getElementById("modal").style.opacity='0';} });
         modal.addEventListener('transitionend', () => modal.style.display = "none");
 
         function updateLikes() {
@@ -342,18 +342,19 @@
             clustered.removeLayer(markers[id]);
             unclustered.addLayer(markers[id]);
             let popupContent = markers[id].getPopup().getContent();
-            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a><\/br><\/br>)/, '<a href="#" onclick="fixLocationFinish(' + id + ')"></br></br><strong>Drag this marker to the correct location and click here to submit your correction.</strong></a></br></br>');
+            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a><\/br><\/br>)/, '<a href="#" onclick="event.preventDefault();fixLocationFinish(' + id + ')"></br></br><strong>Drag this marker to the correct location and click here to submit your correction.</strong></a></br></br>');
             markers[id].getPopup().setContent(popupContent);
             markers[id].dragging.enable();
             markers[id].setIcon(pinkIcon);
             markers[id].off('dragend');
             markers[id].openPopup();
             gtag('event', 'select_content', { 'content_type': 'fix-start' });
+            return false;
         }
 
         function fixLocationFinish(id) {
             let popupContent = markers[id].getPopup().getContent();
-            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a><\/br><\/br>)/, '<a href="#" onclick="fixLocation(' + id + ')"></br></br><strong>Thank you for your fix! It will take about 15 minutes before your update shows up for other people.</strong></a></br></br>');
+            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a><\/br><\/br>)/, '<a href="#" onclick="event.preventDefault();fixLocation(' + id + ');"></br></br><strong>Thank you for your fix! It will take about 15 minutes before your update shows up for other people.</strong></a></br></br>');
             markers[id].getPopup().setContent(popupContent);
             let lat = markers[id].getLatLng().lat;
             let lng = markers[id].getLatLng().lng;
@@ -415,11 +416,11 @@
                                     let lng = location.toString().split(",")[1];
                                     // Create marker.
                                     if (sourceId == "portland-archives") {
-                                        var marker = L.marker([lat,lng]).bindPopup('Portland Archives / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a></br></br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + id + '"><img src="https://efiles.portlandoregon.gov/Record/' + id + '/File/Thumbnail"></br>' + element.t + '</a>');
+                                        var marker = L.marker([lat,lng]).bindPopup('Portland Archives / Date: ' + element.d + ' / <a href="#" onclick="event.preventDefault();fixLocation(' + id + ')"><strong>Fix location</strong></a></br></br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + id + '"><img src="https://efiles.portlandoregon.gov/Record/' + id + '/File/Thumbnail"></br>' + element.t + '</a>');
                                         marker.setIcon(greyIcon);
                                     }
                                     else {
-                                        var marker = L.marker([lat,lng]).bindPopup('Hidden Portland / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a></br></br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
+                                        var marker = L.marker([lat,lng]).bindPopup('Hidden Portland / Date: ' + element.d + ' / <a href="#" onclick="event.preventDefault();fixLocation(' + id + ')"><strong>Fix location</strong></a></br></br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
                                     }
                                     clustered.addLayer(marker);
                                     markers[id] = marker;
@@ -462,14 +463,16 @@
         // Filter and Info buttons
         $(".leaflet-control-locate.leaflet-bar.leaflet-control").after('<div class="leaflet-control-filter leaflet-bar leaflet-control"><a class="leaflet-bar-part leaflet-bar-part-single" title="Filter" href="#" id="toggle-filter"><span></span></a></div>');
         $(".leaflet-control-filter.leaflet-bar.leaflet-control").after('<div class="leaflet-control-info leaflet-bar leaflet-control"><a class="leaflet-bar-part leaflet-bar-part-single" title="Info" href="#" id="toggle-info"><span></span></a></div>');
-        document.getElementById('toggle-filter').addEventListener('click', function() {
+        document.getElementById('toggle-filter').addEventListener('click', function(e) {
             var isOpen = document.getElementById('filters').classList.contains('slide-in');
             document.getElementById('filters').setAttribute('class', isOpen ? 'slide-out' : 'slide-in');
+            e.preventDefault();
         });
-        document.getElementById('toggle-info').addEventListener('click', function() {
+        document.getElementById('toggle-info').addEventListener('click', function(e) {
             document.getElementById("modal").style.display = "inherit"
             document.getElementById("modal").style.opacity = "1";
             $('#modal .modal-content').scrollTop(0);
+            e.preventDefault();
         });
     </script>
 </body>
