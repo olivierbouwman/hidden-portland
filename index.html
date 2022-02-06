@@ -1,27 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hidden Portland for the Curious Map</title>
+    <title>Hidden Portland Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="title" content="Hidden Portland for the Curious Map">
-    <meta name="description" content="Discover Portland through the eyes of the Facebook group 'Hidden Portland for the Curious'.">
+    <meta name="title" content="Hidden Portland Map">
+    <meta name="description" content="Use this map to discover Portland's little treasures when you're out and about, or see how things looked in the past.">
+    <!-- Social Sharing -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://hiddenportlandforthecurious.com">
-    <meta property="og:title" content="Hidden Portland for the Curious Map">
-    <meta property="og:description" content="Discover Portland through the eyes of the Facebook group 'Hidden Portland for the Curious'.">
-    <meta property="og:image" content="https://hiddenportlandforthecurious.com/images/meta.jpg">
+    <meta property="og:url" content="https://hiddenportlandmap.com">
+    <meta property="og:title" content="Hidden Portland Map">
+    <meta property="og:description" content="Use this map to discover Portland's little treasures when you're out and about, or see how things looked in the past.">
+    <meta property="og:image" content="https://hiddenportlandmap.com/images/meta.png">
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://hiddenportlandforthecurious.com">
-    <meta property="twitter:title" content="Hidden Portland for the Curious Map">
-    <meta property="twitter:description" content="Discover Portland through the eyes of the Facebook group 'Hidden Portland for the Curious'.">
-    <meta property="twitter:image" content="https://hiddenportlandforthecurious.com/images/meta.jpg">
+    <meta property="twitter:url" content="https://hiddenportlandmap.com">
+    <meta property="twitter:title" content="Hidden Portland Map">
+    <meta property="twitter:description" content="Use this map to discover Portland's little treasures when you're out and about, or see how things looked in the past.">
+    <meta property="twitter:image" content="https://hiddenportlandmap.com/images/meta.png">
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <!-- CSS -->
     <link rel="stylesheet" href="leaflet/leaflet.css"/>
     <link rel="stylesheet" href="leaflet/MarkerCluster/MarkerCluster.css" />
     <link rel="stylesheet" href="leaflet/MarkerCluster/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="leaflet/Locate/L.Control.Locate.css" />
+    <!-- JavaScript -->
     <script src="jquery-3.6.0.min.js"></script>
     <script src="leaflet/leaflet.js"></script>
     <script src='leaflet/MarkerCluster/leaflet.markercluster.js'></script>
@@ -188,14 +198,14 @@
         <div class="modal-content">
             <a href="#" id="modal-x">&times;</a>
             <h1>Hidden Portland Map</h1>
-            <p>This map lets you explore the "hidden" Portland. Use it to discover little treasures in your neighborhood, or to see how things around you looked in the past when you're out and about.</p>
-            <p>Most markers on this map are from the <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a> community. A wonderful group of people who find and share the creative, weird, and wonderful things they found around town.</p>
+            <p>This map lets you explore the "hidden" Portland. Use it to discover little treasures in your neighborhood, or when you're out and about, to see how things around you looked in the past.</p>
+            <p>Most markers on this map are from the <a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious">Hidden Portland for the Curious</a> community. A wonderful group of people who find and share the creative, weird, and wonderful things around town.</p>
             <p>The map also includes markers with historical photos from <a target="_blank" href="https://efiles.portlandoregon.gov/">the Portland Archives</a>.</p>
             <p>I hope this map and the wonderful content provided by countless people within it brings a little joy to your day. If you like it, please feel free to share it with others.</p>
             <div class="center">
-                <a href="https://www.facebook.com/sharer.php?u=https://hiddenportlandforthecurious.com" target="_blank"><img width=40px height=40px src="./images/facebook.svg"></a>&nbsp;&nbsp;&nbsp;
-                <a href="https://twitter.com/share?url=https://hiddenportlandforthecurious.com" target="_blank"><img width=40px height=40px src="./images/twitter.svg"></a>&nbsp;&nbsp;&nbsp;
-                <a href="https://reddit.com/submit?url=https://hiddenportlandforthecurious.com&title=Explore%20Hidden%20Portland" target="_blank"><img width=40px height=40px src="./images/reddit.svg"></a>
+                <a href="https://www.facebook.com/sharer.php?u=https://hiddenportlandmap.com" target="_blank"><img width=40px height=40px src="./images/facebook.svg"></a>&nbsp;&nbsp;&nbsp;
+                <a href="https://twitter.com/share?url=https://hiddenportlandmap.com" target="_blank"><img width=40px height=40px src="./images/twitter.svg"></a>&nbsp;&nbsp;&nbsp;
+                <a href="https://reddit.com/submit?url=https://hiddenportlandmap.com&title=Explore%20Hidden%20Portland" target="_blank"><img width=40px height=40px src="./images/reddit.svg"></a>
             </div>
             <p class="note">Note: about a quarter of the markers are in the wrong spot due to the technical difficulty of automatically finding the correct location from a piece of text. If you feel so inclined, you can fix a marker by using the "Fix location" link in each marker popup.</p>
             <p class="note">Code for this map is available on <a target="_blank" href="https://github.com/olivierbouwman/hidden-portland">GitHub</a>.</p>
@@ -228,7 +238,6 @@
                 return L.divIcon({ html: cluster.getChildCount(), className: 'map-cluster-circle', iconSize: L.circle()});
             }
         });
-
         var markerIconPink = L.Icon.extend({
             options: {
                 iconUrl:       'leaflet/images/marker-icon-pink.png',
@@ -237,11 +246,22 @@
                 iconSize:    [25, 41],
                 iconAnchor:  [12, 41],
                 popupAnchor: [1, -34],
-                tooltipAnchor: [16, -28],
                 shadowSize:  [41, 41]
             },
         });
         var pinkIcon = new markerIconPink();
+        var markerIconGold = L.Icon.extend({
+            options: {
+                iconUrl:       'leaflet/images/marker-icon-gold.png',
+                iconRetinaUrl: 'leaflet/images/marker-icon-gold-2x.png',
+                shadowUrl:     'leaflet/images/marker-shadow.png',
+                iconSize:    [25, 41],
+                iconAnchor:  [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize:  [41, 41]
+            },
+        });
+        var goldIcon = new markerIconGold();
         var markerIconGrey = L.Icon.extend({
             options: {
                 iconUrl:       'leaflet/images/marker-icon-grey.png',
@@ -250,7 +270,6 @@
                 iconSize:    [25, 41],
                 iconAnchor:  [12, 41],
                 popupAnchor: [1, -34],
-                tooltipAnchor: [16, -28],
                 shadowSize:  [41, 41]
             },
         });
@@ -323,7 +342,7 @@
             clustered.removeLayer(markers[id]);
             unclustered.addLayer(markers[id]);
             let popupContent = markers[id].getPopup().getContent();
-            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a>)/, '<a href="#" onclick="fixLocationFinish(' + id + ')"><br><strong>Drag this marker to the correct location and click here to submit your correction.</strong></a>');
+            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a><\/br><\/br>)/, '<a href="#" onclick="fixLocationFinish(' + id + ')"></br></br><strong>Drag this marker to the correct location and click here to submit your correction.</strong></a></br></br>');
             markers[id].getPopup().setContent(popupContent);
             markers[id].dragging.enable();
             markers[id].setIcon(pinkIcon);
@@ -334,7 +353,7 @@
 
         function fixLocationFinish(id) {
             let popupContent = markers[id].getPopup().getContent();
-            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a>)/, '<a href="#" onclick="fixLocation(' + id + ')"><br><strong>Thank you for your fix! It will take about 15 minutes before your update shows up for other people.</strong></a>');
+            popupContent = popupContent.replace(/<a href="#"(.*?\<\/a><\/br><\/br>)/, '<a href="#" onclick="fixLocation(' + id + ')"></br></br><strong>Thank you for your fix! It will take about 15 minutes before your update shows up for other people.</strong></a></br></br>');
             markers[id].getPopup().setContent(popupContent);
             let lat = markers[id].getLatLng().lat;
             let lng = markers[id].getLatLng().lng;
@@ -349,6 +368,8 @@
                 return;
             }
             submitFixedLocation(source + "_" + id + "_" + lat + "_" + lng);
+            markers[id].dragging.disable();
+            markers[id].setIcon(goldIcon);
             gtag('event', 'select_content', { 'content_type': 'fix-finish' });
         }
 
@@ -394,11 +415,11 @@
                                     let lng = location.toString().split(",")[1];
                                     // Create marker.
                                     if (sourceId == "portland-archives") {
-                                        var marker = L.marker([lat,lng]).bindPopup('Portland Archives / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + id + '"><img src="https://efiles.portlandoregon.gov/Record/' + id + '/File/Thumbnail"><br>' + element.t + '</a>');
+                                        var marker = L.marker([lat,lng]).bindPopup('Portland Archives / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a></br></br><a target="_blank" href="https://efiles.portlandoregon.gov/Record/' + id + '"><img src="https://efiles.portlandoregon.gov/Record/' + id + '/File/Thumbnail"></br>' + element.t + '</a>');
                                         marker.setIcon(greyIcon);
                                     }
                                     else {
-                                        var marker = L.marker([lat,lng]).bindPopup('Hidden Portland / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a><br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
+                                        var marker = L.marker([lat,lng]).bindPopup('Hidden Portland / Date: ' + element.d + ' / <a href="#" onclick="fixLocation(' + id + ')"><strong>Fix location</strong></a></br></br><a target="_blank" href="https://www.facebook.com/groups/Hiddenportlandforthecurious/posts/' + id + '">' + element.t + '</a>');
                                     }
                                     clustered.addLayer(marker);
                                     markers[id] = marker;
@@ -448,6 +469,7 @@
         document.getElementById('toggle-info').addEventListener('click', function() {
             document.getElementById("modal").style.display = "inherit"
             document.getElementById("modal").style.opacity = "1";
+            $('#modal .modal-content').scrollTop(0);
         });
     </script>
 </body>
